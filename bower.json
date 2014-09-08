@@ -1,0 +1,22 @@
+{
+  "name": "capture",
+  "main": "capture.js",
+  "version": "0.0.0",
+  "authors": [
+    "M_Ishikawa <ishikawam@nifty.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.2.0"
+  },
+  "devDependencies": {
+    "cryptojslib": "~3.1.2"
+  }
+}

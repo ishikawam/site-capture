@@ -1,0 +1,90 @@
+/* use compass sass(scss) */
+
+body {
+  padding-top: 50px;
+}
+.starter-template { // from Bootstrap
+  padding: 40px 15px;
+  text-align: center;
+}
+
+#imageWrapPc, #imageWrapTablet, #imageWrapMobile {
+    float: left;
+    margin: 8px;
+    background-repeat: no-repeat;
+    background-position: 0 20px;
+    p {
+        margin-left: 8px;
+    }
+}
+
+#imageWrapPc {
+    background-image: url(../img/SitePageCapturePc.png);
+    width: 520px;
+    height: 461px;
+}
+#imageWrapTablet {
+    background-image: url(../img/SitePageCaptureIpad.png);
+    width: 238px;
+    height: 461px;
+}
+#imageWrapMobile {
+    background-image: url(../img/SitePageCaptureIphone.png);
+    width: 142px;
+    height: 461px;
+}
+
+#imagePc, #imageTablet, #imageMobile {
+    position: relative;
+    overflow: hidden;
+}
+
+#imagePc {
+    top: 8px;
+    left: 20px;
+    width: 479px;
+    height: 270px;
+    .window {
+        width: 479px;
+    }
+}
+#imageTablet {
+    top: 25px;
+    left: 13px;
+    width: 212px;
+    height: 281px;
+    .window {
+        width: 212px;
+    }
+}
+#imageMobile {
+    top: 34px;
+    left: 12px;
+    width: 119px;
+    height: 213px;
+    .window {
+        width: 119px;
+    }
+}
+
+.loading {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: white;
+    opacity: 0.5;
+    img {
+        position: absolute;
+        margin-left: -50px;
+        margin-top: -50px;
+        left: 50%;
+        top: 50%;
+    }
+}
+
+.author {
+    text-align: right;
+    font-style: italic;
+}

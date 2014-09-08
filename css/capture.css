@@ -1,0 +1,111 @@
+/* use compass sass(scss) */
+/* line 3, ../sass/capture.scss */
+body {
+  padding-top: 50px;
+}
+
+/* line 6, ../sass/capture.scss */
+.starter-template {
+  padding: 40px 15px;
+  text-align: center;
+}
+
+/* line 11, ../sass/capture.scss */
+#imageWrapPc, #imageWrapTablet, #imageWrapMobile {
+  float: left;
+  margin: 8px;
+  background-repeat: no-repeat;
+  background-position: 0 20px;
+}
+/* line 16, ../sass/capture.scss */
+#imageWrapPc p, #imageWrapTablet p, #imageWrapMobile p {
+  margin-left: 8px;
+}
+
+/* line 21, ../sass/capture.scss */
+#imageWrapPc {
+  background-image: url(../img/SitePageCapturePc.png);
+  width: 520px;
+  height: 461px;
+}
+
+/* line 26, ../sass/capture.scss */
+#imageWrapTablet {
+  background-image: url(../img/SitePageCaptureIpad.png);
+  width: 238px;
+  height: 461px;
+}
+
+/* line 31, ../sass/capture.scss */
+#imageWrapMobile {
+  background-image: url(../img/SitePageCaptureIphone.png);
+  width: 142px;
+  height: 461px;
+}
+
+/* line 37, ../sass/capture.scss */
+#imagePc, #imageTablet, #imageMobile {
+  position: relative;
+  overflow: hidden;
+}
+
+/* line 42, ../sass/capture.scss */
+#imagePc {
+  top: 8px;
+  left: 20px;
+  width: 479px;
+  height: 270px;
+}
+/* line 47, ../sass/capture.scss */
+#imagePc .window {
+  width: 479px;
+}
+
+/* line 51, ../sass/capture.scss */
+#imageTablet {
+  top: 25px;
+  left: 13px;
+  width: 212px;
+  height: 281px;
+}
+/* line 56, ../sass/capture.scss */
+#imageTablet .window {
+  width: 212px;
+}
+
+/* line 60, ../sass/capture.scss */
+#imageMobile {
+  top: 34px;
+  left: 12px;
+  width: 119px;
+  height: 213px;
+}
+/* line 65, ../sass/capture.scss */
+#imageMobile .window {
+  width: 119px;
+}
+
+/* line 70, ../sass/capture.scss */
+.loading {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: white;
+  opacity: 0.5;
+}
+/* line 78, ../sass/capture.scss */
+.loading img {
+  position: absolute;
+  margin-left: -50px;
+  margin-top: -50px;
+  left: 50%;
+  top: 50%;
+}
+
+/* line 87, ../sass/capture.scss */
+.author {
+  text-align: right;
+  font-style: italic;
+}
