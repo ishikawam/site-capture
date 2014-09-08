@@ -48,44 +48,49 @@ body {
   position: relative;
   overflow: hidden;
 }
+/* line 40, ../sass/capture.scss */
+#imagePc a, #imageTablet a, #imageMobile a {
+  display: block;
+  background: white;
+}
 
-/* line 42, ../sass/capture.scss */
+/* line 46, ../sass/capture.scss */
 #imagePc {
   top: 8px;
   left: 20px;
   width: 479px;
   height: 270px;
 }
-/* line 47, ../sass/capture.scss */
+/* line 51, ../sass/capture.scss */
 #imagePc .window {
   width: 479px;
 }
 
-/* line 51, ../sass/capture.scss */
+/* line 55, ../sass/capture.scss */
 #imageTablet {
   top: 25px;
   left: 13px;
   width: 212px;
   height: 281px;
 }
-/* line 56, ../sass/capture.scss */
+/* line 60, ../sass/capture.scss */
 #imageTablet .window {
   width: 212px;
 }
 
-/* line 60, ../sass/capture.scss */
+/* line 64, ../sass/capture.scss */
 #imageMobile {
   top: 34px;
   left: 12px;
   width: 119px;
   height: 213px;
 }
-/* line 65, ../sass/capture.scss */
+/* line 69, ../sass/capture.scss */
 #imageMobile .window {
   width: 119px;
 }
 
-/* line 70, ../sass/capture.scss */
+/* line 74, ../sass/capture.scss */
 .loading {
   position: absolute;
   left: 0;
@@ -95,7 +100,7 @@ body {
   background: white;
   opacity: 0.5;
 }
-/* line 78, ../sass/capture.scss */
+/* line 82, ../sass/capture.scss */
 .loading img {
   position: absolute;
   margin-left: -50px;
@@ -104,7 +109,7 @@ body {
   top: 50%;
 }
 
-/* line 87, ../sass/capture.scss */
+/* line 91, ../sass/capture.scss */
 .author {
   text-align: right;
   font-style: italic;

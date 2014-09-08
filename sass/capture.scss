@@ -37,6 +37,10 @@ body {
 #imagePc, #imageTablet, #imageMobile {
     position: relative;
     overflow: hidden;
+    a {
+        display: block;
+        background: white; // 透過の場合があるので
+    }
 }
 
 #imagePc {

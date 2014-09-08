@@ -6,7 +6,7 @@
         }
         lock[id] = true;
         $(id).append('<div class="loading"><img src="img/gif-load.gif"></div>');
-        url = $('#url').val();
+        var url = $('#url').val();
         console.log([url, id, w, h, ua]);
         $.ajax({
             type: 'POST',
@@ -67,6 +67,8 @@
     );
 
     var load = function(){
+        var url = $('#url').val();
+        location.hash = '#' + url;
         cap('#imagePc', config.pc.width, config.pc.height, config.pc.ua);
         cap('#imageTablet', config.tablet.width, config.tablet.height, config.tablet.ua);
         cap('#imageMobile', config.mobile.width, config.mobile.height, config.mobile.ua);
@@ -80,4 +82,14 @@
             load();
         }
     });
+
+    $(window).hashchange(function(){
+        var url = location.hash.replace(/^#/, '');
+        $('#url').val(url);
+        load();
+    });
+
+    if (location.hash) {
+        $(window).hashchange();
+    }
 })();

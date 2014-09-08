@@ -17,6 +17,7 @@
     "bootstrap": "~3.2.0"
   },
   "devDependencies": {
-    "cryptojslib": "~3.1.2"
+    "cryptojslib": "~3.1.2",
+    "jquery-hashchange": "*"
   }
 }
