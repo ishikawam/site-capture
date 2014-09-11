@@ -130,6 +130,13 @@ var RenderUrlsToFile = function(urls, callbackPerUrl, callbackFinal) {
         width: width,
         height: height
     };
+    page.clipRect = {
+        // トリミング
+        top: 0,
+        left: 0,
+        width: width,
+        height: height
+    };
     page.settings.userAgent = user_agent;
     page.settings.resourceTimeout = 60 * 1000;
 // iphone5 320x568
@@ -166,6 +173,11 @@ var RenderUrlsToFile = function(urls, callbackPerUrl, callbackFinal) {
         var file = 'render/'+ dir + '/' + url_sha1.substr(0, 2) + '/' + url_sha1 + '.png';
         var file_har = 'har/'+ dir + '/' + url_sha1.substr(0, 2) + '/' + url_sha1;
         var file_content = 'content/'+ dir + '/' + url_sha1.substr(0, 2) + '/' + url_sha1 + '.html';
+
+        page.evaluate(function() {
+            // 透過の場合用 背景を白に
+            document.body.bgColor = 'white';
+        });
 
         if (status === 'success') {
             return window.setTimeout((function() {
