@@ -49,7 +49,12 @@ $return = array(
 
 // キャッシュ
 $file = 'render/' . substr(sha1($ua), 0, 16) . '_' . $width . '_' . $height . '/' . substr(sha1($url), 0, 2) . '/' . sha1($url) . '.png';
+$file_har = 'har/' . substr(sha1($ua), 0, 16) . '_' . $width . '_' . $height . '/' . substr(sha1($url), 0, 2) . '/' . sha1($url);
+$file_content = 'content/' . substr(sha1($ua), 0, 16) . '_' . $width . '_' . $height . '/' . substr(sha1($url), 0, 2) . '/' . sha1($url) . '.html';
 $return['cacheUrl'] = 'http://' . $_SERVER['HTTP_HOST'] . '/' . $file;
+$return['harUrl'] = 'http://' . $_SERVER['HTTP_HOST'] . '/' . $file_har;
+$return['contentUrl'] = 'http://' . $_SERVER['HTTP_HOST'] . '/' . $file_content;
+
 if (!$force && file_exists($file)) {
     $return['status'] = 'cache';
 } else {

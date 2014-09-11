@@ -165,11 +165,11 @@ var RenderUrlsToFile = function(urls, callbackPerUrl, callbackFinal) {
         var url_sha1 = CryptoJS.SHA1(url).toString();
         var file = 'render/'+ dir + '/' + url_sha1.substr(0, 2) + '/' + url_sha1 + '.png';
         var file_har = 'har/'+ dir + '/' + url_sha1.substr(0, 2) + '/' + url_sha1;
+        var file_content = 'content/'+ dir + '/' + url_sha1.substr(0, 2) + '/' + url_sha1 + '.html';
 
         if (status === 'success') {
-//            return window.setTimeout((function() {
+            return window.setTimeout((function() {
                 page.render(file);
-
                 page.endTime = new Date();
                 page.title = page.evaluate(function () {
                     return document.title;
@@ -177,8 +177,10 @@ var RenderUrlsToFile = function(urls, callbackPerUrl, callbackFinal) {
                 har = createHAR(url, page);
                 fs.write(file_har, JSON.stringify(har, undefined, 4));
 
+                fs.write(file_content, page.content);
+
                 return next(status, url, file);
-//            }), 200);
+            }), 4000); // 開いて2秒後がだいたい整っていると判断。あと、これしないとJSでリダイレクトの場合何も取れない。@todo; あとそもそもメモリ足りてない
         } else {
             return next(status, url, file);
         }

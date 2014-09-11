@@ -5,7 +5,7 @@
             return;
         }
         lock[id] = true;
-        $(id).append('<div class="loading"><img src="img/gif-load.gif"></div>');
+        $(id).append('<div class="loading"><img src="img/gif-load-blue.gif"></div>');
         var url = $('#url').val();
         console.log([url, id, w, h, ua]);
         $.ajax({
