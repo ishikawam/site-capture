@@ -1,3 +1,8 @@
+/**
+ * @todo;
+ * 各種を並列で取ってきて欲しいのにできてない
+ * Delayを0、3秒、6秒、とかでバックグラウンドで取ってきてそれを順次表示して欲しい
+ */
 (function(){
     var lock = [];
     var cap = function(id, w, h, ua){
@@ -46,7 +51,8 @@
         pc: {
             width: 1920,
             height: 1080,
-            ua: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.94 Safari/537.36'
+            ua: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_4) AppleWebKit/537.78.2 (KHTML, like Gecko) Version/7.0.6 Safari/537.78.2' // mac safari 1024x768
+//            ua: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.94 Safari/537.36' // mac chrome 1024x768
         },
         tablet: {
             width: 768,

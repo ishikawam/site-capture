@@ -5,6 +5,8 @@
  * 保存場所は sha1(user_agent)の先頭16文字+'_'+width+'_'+height+'/'+sha1(url)の先頭2文字+'/'+ sha1(url) .png
  * @todo; netsniff.js のHARを活用したい
  * @todo; リダイレクトされたらsuccessなのに保存されないぽい
+ * @todo; やっぱり並列処理考えないと、現状はプロセス別に走ってるのに待っちゃう。。なんでかわからない。
+ * @todo; casperjs使いたい。
  */
 
 var system = require('system');
@@ -124,7 +126,8 @@ var RenderUrlsToFile = function(urls, callbackPerUrl, callbackFinal) {
     var url = urls[0];
     var width = urls[1] ? urls[1] : 1024;
     var height = urls[2] ? urls[2] : Math.round(width*3/4);
-    var user_agent = urls[3] ? urls[3] : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.94 Safari/537.36'; // mac 1024x768
+    var user_agent = urls[3] ? urls[3] : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_4) AppleWebKit/537.78.2 (KHTML, like Gecko) Version/7.0.6 Safari/537.78.2'; // mac safari 1024x768
+//    var user_agent = urls[3] ? urls[3] : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.94 Safari/537.36'; // mac chrome 1024x768
 
     page.viewportSize = {
         width: width,
