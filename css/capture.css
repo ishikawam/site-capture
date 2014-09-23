@@ -11,82 +11,82 @@ body {
 }
 
 /* line 11, ../sass/capture.scss */
-#imageWrapPc, #imageWrapTablet, #imageWrapMobile {
+.imageWrapPc, .imageWrapTablet, .imageWrapMobile {
   float: left;
   margin: 8px;
   background-repeat: no-repeat;
   background-position: 0 20px;
 }
 /* line 16, ../sass/capture.scss */
-#imageWrapPc p, #imageWrapTablet p, #imageWrapMobile p {
+.imageWrapPc p, .imageWrapTablet p, .imageWrapMobile p {
   margin-left: 8px;
 }
 
 /* line 21, ../sass/capture.scss */
-#imageWrapPc {
+.imageWrapPc {
   background-image: url(../img/SitePageCapturePc.png);
   width: 520px;
   height: 461px;
 }
 
 /* line 26, ../sass/capture.scss */
-#imageWrapTablet {
+.imageWrapTablet {
   background-image: url(../img/SitePageCaptureIpad.png);
   width: 238px;
   height: 461px;
 }
 
 /* line 31, ../sass/capture.scss */
-#imageWrapMobile {
+.imageWrapMobile {
   background-image: url(../img/SitePageCaptureIphone.png);
   width: 142px;
   height: 461px;
 }
 
 /* line 37, ../sass/capture.scss */
-#imagePc, #imageTablet, #imageMobile {
+.imagePc, .imageTablet, .imageMobile {
   position: relative;
   overflow: hidden;
 }
 /* line 40, ../sass/capture.scss */
-#imagePc a, #imageTablet a, #imageMobile a {
+.imagePc a, .imageTablet a, .imageMobile a {
   display: block;
   background: white;
 }
 
 /* line 46, ../sass/capture.scss */
-#imagePc {
+.imagePc {
   top: 8px;
   left: 20px;
   width: 479px;
   height: 270px;
 }
 /* line 51, ../sass/capture.scss */
-#imagePc .window {
+.imagePc .window {
   width: 479px;
 }
 
 /* line 55, ../sass/capture.scss */
-#imageTablet {
+.imageTablet {
   top: 25px;
   left: 13px;
   width: 212px;
   height: 281px;
 }
 /* line 60, ../sass/capture.scss */
-#imageTablet .window {
+.imageTablet .window {
   width: 212px;
 }
 
 /* line 64, ../sass/capture.scss */
-#imageMobile {
+.imageMobile {
   top: 34px;
   left: 12px;
   width: 119px;
   height: 213px;
 }
 /* line 69, ../sass/capture.scss */
-#imageMobile .window {
+.imageMobile .window {
   width: 119px;
 }
 

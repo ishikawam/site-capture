@@ -58,9 +58,14 @@ $return['contentUrl'] = 'http://' . $_SERVER['HTTP_HOST'] . '/' . $file_content;
 if (!$force && file_exists($file)) {
     $return['status'] = 'cache';
 } else {
-    // phantom
+    // casperjs use phantomjs
+    $str = ('casperjs --engine=phantomjs cli/render_casper.js ' . $url . ' ' . $width . ' ' . $height . ' \'' . $ua . '\'');
+    // casperjs use slimerjs
+    $str = ('casperjs --engine=slimerjs cli/render_casper.js ' . $url . ' ' . $width . ' ' . $height . ' \'' . $ua . '\'');
+    // phantomjs
+    $str = ('phantomjs cli/render_phantom.js ' . $url . ' ' . $width . ' ' . $height . ' \'' . $ua . '\'');
+// @todo;全然とちゅう
     $output = array();
-    $str = ('phantomjs render_url.js ' . $url . ' ' . $width . ' ' . $height . ' \'' . $ua . '\'');
     $result = exec($str, $output);
     if (!preg_match('/^Rendered /', $result)) {
         $return['status'] = 'error';

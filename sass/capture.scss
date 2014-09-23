@@ -8,7 +8,7 @@ body {
   text-align: center;
 }
 
-#imageWrapPc, #imageWrapTablet, #imageWrapMobile {
+.imageWrapPc, .imageWrapTablet, .imageWrapMobile {
     float: left;
     margin: 8px;
     background-repeat: no-repeat;
@@ -18,23 +18,23 @@ body {
     }
 }
 
-#imageWrapPc {
+.imageWrapPc {
     background-image: url(../img/SitePageCapturePc.png);
     width: 520px;
     height: 461px;
 }
-#imageWrapTablet {
+.imageWrapTablet {
     background-image: url(../img/SitePageCaptureIpad.png);
     width: 238px;
     height: 461px;
 }
-#imageWrapMobile {
+.imageWrapMobile {
     background-image: url(../img/SitePageCaptureIphone.png);
     width: 142px;
     height: 461px;
 }
 
-#imagePc, #imageTablet, #imageMobile {
+.imagePc, .imageTablet, .imageMobile {
     position: relative;
     overflow: hidden;
     a {
@@ -43,7 +43,7 @@ body {
     }
 }
 
-#imagePc {
+.imagePc {
     top: 8px;
     left: 20px;
     width: 479px;
@@ -52,7 +52,7 @@ body {
         width: 479px;
     }
 }
-#imageTablet {
+.imageTablet {
     top: 25px;
     left: 13px;
     width: 212px;
@@ -61,7 +61,7 @@ body {
         width: 212px;
     }
 }
-#imageMobile {
+.imageMobile {
     top: 34px;
     left: 12px;
     width: 119px;

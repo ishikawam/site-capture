@@ -5,7 +5,7 @@
  */
 (function(){
     var lock = [];
-    var cap = function(id, w, h, ua){
+    var cap = function(id, w, h, ua, engine){
         if (lock[id]) {
             return;
         }
@@ -20,7 +20,8 @@
                 url: url,
                 w: w,
                 h: h,
-                ua: ua
+                ua: ua,
+                e: engine
             },
             timeout: 60*1000,
             success: function(res){
@@ -66,6 +67,8 @@
         },
     };
 
+    var engine = ['phantom', 'casper_phantom', 'casper_slimer'];
+
     $('#explain').html(
         '<p>pc: ' + config.pc.width + 'x' + config.pc.height + ' ' + config.pc.ua + '</p>' +
         '<p>tablet: ' + config.tablet.width + 'x' + config.tablet.height + ' ' + config.tablet.ua + '</p>' +
@@ -75,9 +78,11 @@
     var load = function(){
         var url = $('#url').val();
         location.hash = '#' + url;
-        cap('#imagePc', config.pc.width, config.pc.height, config.pc.ua);
-        cap('#imageTablet', config.tablet.width, config.tablet.height, config.tablet.ua);
-        cap('#imageMobile', config.mobile.width, config.mobile.height, config.mobile.ua);
+        for (var key in engine) {
+            for (var target in config) {
+                cap('#image_' + engine[key] + '_' + target, config[target].width, config[target].height, config[target].ua, engine[key]);
+            }
+        }
     }
 
     $('#captureBtn').click(function(){
