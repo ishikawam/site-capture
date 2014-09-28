@@ -8,6 +8,10 @@ body {
   text-align: center;
 }
 
+.imageWrap {
+    display: inline-block;
+}
+
 .imageWrapPc, .imageWrapTablet, .imageWrapMobile {
     float: left;
     margin: 8px;
@@ -90,5 +94,13 @@ body {
 
 .author {
     text-align: right;
-    font-style: italic;
+    font-syle: italic;
+}
+
+.starter-template.sub {
+    padding-bottom: 0;
+}
+
+.center {
+    text-align: center;
 }

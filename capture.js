@@ -1,7 +1,6 @@
 /**
  * @todo;
  * 各種を並列で取ってきて欲しいのにできてない
- * Delayを0、3秒、6秒、とかでバックグラウンドで取ってきてそれを順次表示して欲しい
  */
 (function(){
     var lock = [];
@@ -9,6 +8,7 @@
         if (lock[id]) {
             return;
         }
+        start_time = new Date/1000;
         lock[id] = true;
         $(id).append('<div class="loading"><img src="img/gif-load-blue.gif"></div>');
         var url = $('#url').val();
@@ -21,7 +21,7 @@
                 w: w,
                 h: h,
                 ua: ua,
-                e: engine
+                e: engine // phantom, casper_phantom or casper_slimer
             },
             timeout: 60*1000,
             success: function(res){
@@ -41,7 +41,7 @@
                 $(id).html(''); // @todo; errorぽい画面出したい。テレビのノイズぽいの
             },
             complete: function(data){
-                console.log('finish');
+                console.log('finish ' + ((new Date/1000) - start_time));
                 lock[id] = false;
             }
         });
@@ -69,11 +69,11 @@
 
     var engine = ['phantom', 'casper_phantom', 'casper_slimer'];
 
-    $('#explain').html(
-        '<p>pc: ' + config.pc.width + 'x' + config.pc.height + ' ' + config.pc.ua + '</p>' +
-        '<p>tablet: ' + config.tablet.width + 'x' + config.tablet.height + ' ' + config.tablet.ua + '</p>' +
-        '<p>mobile: ' + config.mobile.width + 'x' + config.mobile.height + ' ' + config.mobile.ua + '</p>'
-    );
+    var str = '';
+    for (var target in config) {
+        str += '<p>' + target + ': ' + config[target].width + 'x' + config[target].height + ' ' + config[target].ua + '</p>';
+    }
+    $('#explain').html(str);
 
     var load = function(){
         var url = $('#url').val();

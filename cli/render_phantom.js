@@ -173,7 +173,7 @@ var RenderUrlsToFile = function(urls, callbackPerUrl, callbackFinal) {
         // 保存ファイル名 sha1のprefix 2文字をディレクトリにして(gitと同じ)想定256*10000=200万サイトくらいかな
         var dir = CryptoJS.SHA1(user_agent).toString().substr(0, 16) + '_' + width + '_' + height;
         var url_sha1 = CryptoJS.SHA1(url).toString();
-        var file = 'render/'+ dir + '/' + url_sha1.substr(0, 2) + '/' + url_sha1 + '.png';
+        var file = 'render/phantom/'+ dir + '/' + url_sha1.substr(0, 2) + '/' + url_sha1 + '.png';
         var file_har = 'har/'+ dir + '/' + url_sha1.substr(0, 2) + '/' + url_sha1;
         var file_content = 'content/'+ dir + '/' + url_sha1.substr(0, 2) + '/' + url_sha1 + '.html';
 
