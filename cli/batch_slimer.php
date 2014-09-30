@@ -15,7 +15,8 @@ if (exec('uname') == 'Linux') {
     $display = 'DISPLAY=' . $display_num . ' ';
 }
 
-/*
+usleep(mt_rand(0,1000000)); // 同時起動をずらす
+
 // lock
 $output = array();
 $count = 0;
@@ -25,17 +26,11 @@ foreach ($output as $val) {
         $count ++;
     }
 }
-if ($count > 30) { // slimerは同時起動1つくらい。だけど、何故かうまくいかないので。。排他考えなきゃ
-error_log('Over' . $count);
+if ($count > 1) { // slimerは同時起動1つくらい。
     var_dump($output);
     exit;
 }
-*/
 
-// 排他にセマフォ使ってみる...やっぱやめた。ぜんぜんだめ。リリースされたら一気に走り過ぎる
-$sid = sem_get(884);
-$sem = sem_acquire($sid);
-error_log('semafo!');
 $return = array();
 
 $engine = 'slimer';
@@ -109,7 +104,3 @@ for ($i = 0; $i < 1000; $i ++) {
         }
     }
 }
-
-// セマフォを解放
-sem_release($sem);
-error_log('Done');

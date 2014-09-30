@@ -12,6 +12,8 @@ if (exec('uname') == 'Linux') {
     $path = '/home/m_ishikawa/.nvm/v0.10.22/bin/';
 }
 
+usleep(mt_rand(0,1000000)); // 同時起動をずらす
+
 // lock
 $output = array();
 $count = 0;
@@ -21,7 +23,7 @@ foreach ($output as $val) {
         $count ++;
     }
 }
-if ($count > 3) { // phantomは同時起動3つくらい？
+if ($count > 1) { // phantomは同時起動3つくらい？
     var_dump($output);
     exit;
 }

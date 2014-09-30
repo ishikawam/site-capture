@@ -31,6 +31,13 @@ $force = trim($_REQUEST['f']) == true; // 取得
 
 $force = false; // 今は制限
 
+$device = 'pc';
+if ($width / $height < 0.6) {
+    $device = 'iphone';
+} else if ($width / $height < 1) {
+    $device = 'ipad';
+}
+
 // validation
 // http:// 省略の場合、付加
 if (!preg_match('/^(https?|ftp):\/\//', $url)) {
@@ -39,6 +46,7 @@ if (!preg_match('/^(https?|ftp):\/\//', $url)) {
 // ドメイン部を抽出
 if (!preg_match('/^(https?|ftp):\/\/(([a-zA-Z0-9][a-zA-Z0-9-]+\.)+[a-zA-Z]+)/', $url, $output)) {
     $return['status'] = 'error';
+    $return['imageUrl'] = 'http://' . $_SERVER['HTTP_HOST'] . '/img/error_' . $device . '.png';
     $return['result'] = 'URL invalid.';
     header('Content-Type: application/json; charset=utf-8');
     echo json_encode($return);
@@ -108,23 +116,16 @@ if (!$force && file_exists($file)) {
                 'ip' => $_SERVER['HTTP_X_FORWARDED_FOR'] ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'],
             ));
         $status = 'wait';
-        usleep(1000); // すぐDB読んでも反映されないので
+//        usleep(1000); // すぐDB読んでも反映されないので
+
+        // 取得スクリプトを起こす
+        exec('php cli/batch_' . $engine . '.php > /dev/null &');
+
     } else {
         $status = $res['status'];
         if ($status == 'busy' || !$status) {
             $status = 'wait';
         }
-    }
-
-    // 取得スクリプトを起こす
-    exec('php cli/batch_slimer.php > /dev/null &');
-    exec('php cli/batch_phantom.php > /dev/null &');
-
-    $device = 'pc';
-    if ($width / $height < 0.6) {
-        $device = 'iphone';
-    } else if ($width / $height < 1) {
-        $device = 'ipad';
     }
 
     switch ($status) {

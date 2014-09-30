@@ -4,16 +4,18 @@
  */
 (function(){
     var lock = [];
-    var cap = function(id, w, h, ua, engine){
+    var url;
+    var cap = function(id, w, h, ua, engine, cont){
         if (lock[id]) {
             return;
         }
+
         start_time = new Date/1000;
-        lock[id] = true;
-        $(id).append('<div class="loading"><img src="img/gif-load-blue.gif"></div>');
-        var url = $('#url').val();
+        if (!cont) {
+            $(id).append('<div class="loading"><img src="img/gif-load-blue.gif"></div>');
+            url = $('#url').val();
+        }
         console.log([url, id, w, h, ua]);
-//var callee = arguments.callee;
         $.ajax({
             type: 'POST',
             url: '/capture.php',
@@ -31,13 +33,11 @@
                 if (res.status === 'error') {
 //                    console.log(['error', res.result, res.command]);
                     $(id).html(''); // @todo; errorぽい画面出したい。テレビのノイズぽいの
-                    return;
                 } else if (res.status === 'wait') {
 //                    console.log(['waiting...', res.result, res.command]);
                     console.log([url,w,h,ua,engine,id]);
-//                    setTimeout(callee, 1000);
                     setTimeout(function() {
-                        cap(id, w, h, ua, engine);
+                        cap(id, w, h, ua, engine, true);
                     }, 1000);
                     return;
                 }
@@ -48,6 +48,17 @@
             error: function(XMLHttpRequest, textStatus, errorThrown){
                 console.log(['error', XMLHttpRequest, textStatus, errorThrown]);
                 $(id).html(''); // @todo; errorぽい画面出したい。テレビのノイズぽいの
+
+                var device = 'pc';
+                if (w / h < 0.6) {
+                    device = 'iphone';
+                } else if (w / h < 1) {
+                    device = 'ipad';
+                }
+                var imageUrl = '/img/error_' + device + '.png';
+                var img = $('<a target="_blank">').attr('href', imageUrl); // @todo; lightbox
+                img.append($('<img class="window">').attr('src', imageUrl));
+                $(id).html(img);
             },
             complete: function(data){
                 console.log('finish ' + ((new Date/1000) - start_time));
@@ -84,7 +95,7 @@
     }
     $('#explain').html(str);
 
-    var load = function(){
+    var load = function() {
         var url = $('#url').val();
         location.hash = '#' + url;
         for (var key in engine) {
