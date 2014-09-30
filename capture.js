@@ -13,6 +13,7 @@
         $(id).append('<div class="loading"><img src="img/gif-load-blue.gif"></div>');
         var url = $('#url').val();
         console.log([url, id, w, h, ua]);
+//var callee = arguments.callee;
         $.ajax({
             type: 'POST',
             url: '/capture.php',
@@ -21,19 +22,27 @@
                 w: w,
                 h: h,
                 ua: ua,
-                e: engine // phantom, casper_phantom or casper_slimer
+                e: engine // phantom or slimer
             },
             timeout: 60*1000,
             success: function(res){
-                console.log(this.data);
+//                console.log(this.data);
                 console.log(res);
                 if (res.status === 'error') {
-                    console.log(['error', res.result, res.command]);
+//                    console.log(['error', res.result, res.command]);
                     $(id).html(''); // @todo; errorぽい画面出したい。テレビのノイズぽいの
                     return;
+                } else if (res.status === 'wait') {
+//                    console.log(['waiting...', res.result, res.command]);
+                    console.log([url,w,h,ua,engine,id]);
+//                    setTimeout(callee, 1000);
+                    setTimeout(function() {
+                        cap(id, w, h, ua, engine);
+                    }, 1000);
+                    return;
                 }
-                var img = $('<a target="_blank">').attr('href', res.cacheUrl); // @todo; lightbox
-                img.append($('<img class="window">').attr('src', res.cacheUrl));
+                var img = $('<a target="_blank">').attr('href', res.imageUrl); // @todo; lightbox
+                img.append($('<img class="window">').attr('src', res.imageUrl));
                 $(id).html(img);
             },
             error: function(XMLHttpRequest, textStatus, errorThrown){
@@ -42,7 +51,7 @@
             },
             complete: function(data){
                 console.log('finish ' + ((new Date/1000) - start_time));
-                lock[id] = false;
+                lock[id] = false; // ここのロック見直したい @todo;
             }
         });
     };
@@ -67,7 +76,7 @@
         },
     };
 
-    var engine = ['phantom', 'casper_phantom', 'casper_slimer'];
+    var engine = ['phantom', 'slimer'];
 
     var str = '';
     for (var target in config) {

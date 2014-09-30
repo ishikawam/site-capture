@@ -165,6 +165,10 @@ var RenderUrlsToFile = function(urls, callbackPerUrl, callbackFinal) {
             page.resources[res.id].startReply = res;
         }
         if (res.stage === 'end') {
+            if (res.id == 1) {
+                // 対象ページと判断する＜ここにはページ内全要素のアクセス結果が来るので
+                console.log('PhantomStatus: ' + res.status); // null, 200, 301, とかかな
+            }
             page.resources[res.id].endReply = res;
         }
     };
@@ -208,15 +212,17 @@ if (system.args.length > 1) {
     // 引数 1,url 2,width(デフォルト1024) 3,height(デフォルトwidth*3/4) 4, useragent(デフォルトMac)
     arrayOfUrls = Array.prototype.slice.call(system.args, 1);
 } else {
-    console.log('Error');
+    console.log('PhantomError: invalid');
     phantom.exit();
 }
 
 RenderUrlsToFile(arrayOfUrls, (function(status, url, file) {
     if (status !== 'success') {
-        return console.log('Unable to render "' + url + '"');
+        return console.log('PhantomError: ' + status ); // fail, 
+//        return console.log('Unable to render "' + url + '"');
     } else {
-        return console.log('Rendered "' + url + '" at "' + file + '"');
+        return console.log('PhantomOk: ' + status);
+//        return console.log('Rendered "' + url + '" at "' + file + '"');
     }
 }), function() {
     return phantom.exit();

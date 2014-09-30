@@ -19,7 +19,7 @@ if (system.args.length > 4) {
     // 引数 3, engine (phantomjs or slimerjs) 4,url 5,width(デフォルト1024) 6,height(デフォルトwidth*3/4) 7, useragent(デフォルトMac)
     urls = Array.prototype.slice.call(system.args, 1);
 } else {
-    console.log('Error');
+    console.log('CasperError: invalid');
 }
 
 var engine = urls[3];
@@ -52,23 +52,24 @@ if (user_agent) {
 // 保存ファイル名 sha1のprefix 2文字をディレクトリにして(gitと同じ)想定256*10000=200万サイトくらいかな
 var dir = CryptoJS.SHA1(user_agent).toString().substr(0, 16) + '_' + width + '_' + height;
 var url_sha1 = CryptoJS.SHA1(url).toString();
-var file = 'render/casper_' + engine + '/' + dir + '/' + url_sha1.substr(0, 2) + '/' + url_sha1 + '.png';
+var file = 'render/' + engine + '/' + dir + '/' + url_sha1.substr(0, 2) + '/' + url_sha1 + '.png';
 //var file_har = 'har/'+ dir + '/' + url_sha1.substr(0, 2) + '/' + url_sha1;
 //var file_content = 'content/'+ dir + '/' + url_sha1.substr(0, 2) + '/' + url_sha1 + '.html';
 
 //casper.open(url).then(function() {
 casper.open(url).viewport(width, height).then(function() {
 //    this.echo(this.getTitle());
-//    this.echo('Done.');
 
     status_code = this.status().currentHTTPStatus;
 
-//    this.echo(status_code);
-    if (status_code == null) {
-        // エラーを画像保存しないように
-        this.echo('Error');
+    if (status_code === null) {
+        // エラーを画像保存しないように。Not Found扱い
+        this.echo('CasperError: null');
         return;
     }
+
+    // 301, 302, 200, が成功っぽい。他が来た時は？とりあえずログに残す
+    this.echo('CasperOk: ' + status_code);
 
     this.page.evaluate(function() {
         // phantomjs: 透過の場合用 背景を白に
