@@ -74,12 +74,21 @@ $cacheUrl = $imageUrl;
 if (!$force && file_exists($file)) {
     $status = 'cache';
 
-    // phantomでキャッシュがあるならhar, contentがある前提
+    // har, content
     if ($engine == 'phantom') {
         $file_har = 'har/' . substr(sha1($ua), 0, 16) . '_' . $width . '_' . $height . '/' . substr(sha1($url), 0, 2) . '/' . sha1($url);
+        $file_yslow = 'yslow/' . substr(sha1($ua), 0, 16) . '_' . $width . '_' . $height . '/' . substr(sha1($url), 0, 2) . '/' . sha1($url);
         $file_content = 'content/' . substr(sha1($ua), 0, 16) . '_' . $width . '_' . $height . '/' . substr(sha1($url), 0, 2) . '/' . sha1($url) . '.html';
         if (file_exists($file_har)) {
             $return['harUrl'] = 'http://' . $_SERVER['HTTP_HOST'] . '/' . $file_har;
+
+            if (file_exists($file_yslow)) {
+                $return['yslowUrl'] = 'http://' . $_SERVER['HTTP_HOST'] . '/' . $file_yslow;
+            } else {
+                // yslow生成
+                mkdir(dirname($file_yslow), 0755, true);
+                exec($path . 'yslow --info basic --format plain ' . $file_har . ' > ' . $file_yslow);
+            }
         }
         if (file_exists($file_content)) {
             $return['contentUrl'] = 'http://' . $_SERVER['HTTP_HOST'] . '/' . $file_content;

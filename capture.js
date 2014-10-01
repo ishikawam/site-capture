@@ -41,8 +41,36 @@
                     }, 1000);
                     return;
                 }
-                var img = $('<a target="_blank">').attr('href', res.imageUrl); // @todo; lightbox
-                img.append($('<img class="window">').attr('src', res.imageUrl));
+                if (res.status == 'ok' || res.status == 'cache') {
+                    var img = $('<a target="_blank">').attr('href', res.imageUrl); // @todo; lightbox
+                    img.append($('<img class="window">').attr('src', res.imageUrl));
+
+                    if (res.yslowUrl) { // phantomに限る
+                        // 何度か来るので最初の1回のみ
+                        if (!$('#feed').text()) {
+                            $('#feed').append(' <a target="_blank" href="' + res.request.url + '">' + res.request.url + '</a> ');
+                        }
+
+                        var yslow = $('<a class="toolhint" target="_blank">yslow(' + w + 'x' + h + ')<span id="toolhint_' + w + '_' + h +  '"></span></a>');
+                        yslow.click(res, function(event) {
+                            console.log(event);
+                            $.ajax({
+                                type: 'GET',
+                                url: event.data.yslowUrl,
+                                timeout: 6*1000,
+                                success: function(res){
+                                    $('#toolhint_' + event.data.request.width + '_' + event.data.request.height).text(res);
+                                    $('#toolhint_' + event.data.request.width + '_' + event.data.request.height).addClass('toolhint');
+                                    console.log(res);
+                                }
+                            });
+                        });
+                        $('#feed').append(' , ').append(yslow);
+                    }
+
+                } else {
+                    var img = $('<img class="window">').attr('src', res.imageUrl);
+                }
                 $(id).html(img);
             },
             error: function(XMLHttpRequest, textStatus, errorThrown){
@@ -56,8 +84,7 @@
                     device = 'ipad';
                 }
                 var imageUrl = '/img/error_' + device + '.png';
-                var img = $('<a target="_blank">').attr('href', imageUrl); // @todo; lightbox
-                img.append($('<img class="window">').attr('src', imageUrl));
+                var img = $('<img class="window">').attr('src', imageUrl);
                 $(id).html(img);
             },
             complete: function(data){
@@ -96,6 +123,7 @@
     $('#explain').html(str);
 
     var load = function() {
+        $('#feed').text('');
         var url = $('#url').val();
         location.hash = '#' + url;
         for (var key in engine) {

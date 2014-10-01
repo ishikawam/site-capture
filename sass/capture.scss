@@ -1,11 +1,11 @@
 /* use compass sass(scss) */
 
 body {
-  padding-top: 50px;
+    padding-top: 50px;
 }
 .starter-template { // from Bootstrap
-  padding: 40px 15px;
-  text-align: center;
+    padding: 40px 15px;
+    text-align: center;
 }
 
 .imageWrap {
@@ -103,4 +103,33 @@ body {
 
 .center {
     text-align: center;
+}
+
+.feed {
+    padding: 0 40px;
+    margin: 0;
+    &:before {
+        content: '-> ';
+    }
+}
+
+.lead {
+    margin-bottom: 2px;
+}
+
+a.toolhint span.toolhint {
+    display: none;
+    width: 200px;
+    padding: 5px;
+    margin: 10px 0 0 -10px;
+}
+a.toolhint:hover span.toolhint {
+    display: inline;
+    position: absolute;
+    border: 1px solid #CCC;
+    border-radius: 5px;
+    background: #F7F7F7;
+    color: #666;
+    font-size: 12px;
+    line-height: 1.6em;
 }
