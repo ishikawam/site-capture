@@ -33,9 +33,9 @@ $force = false; // 今は制限
 
 $device = 'pc';
 if ($width / $height < 0.6) {
-    $device = 'iphone';
+    $device = 'mobile';
 } else if ($width / $height < 1) {
-    $device = 'ipad';
+    $device = 'tablet';
 }
 
 // validation
@@ -81,13 +81,13 @@ if (!$force && file_exists($file)) {
         $file_content = 'content/' . substr(sha1($ua), 0, 16) . '_' . $width . '_' . $height . '/' . substr(sha1($url), 0, 2) . '/' . sha1($url) . '.html';
         if (file_exists($file_har)) {
             $return['harUrl'] = 'http://' . $_SERVER['HTTP_HOST'] . '/' . $file_har;
-
-            if (file_exists($file_yslow)) {
-                $return['yslowUrl'] = 'http://' . $_SERVER['HTTP_HOST'] . '/' . $file_yslow;
-            } else {
+            $return['yslowUrl'] = 'http://' . $_SERVER['HTTP_HOST'] . '/' . $file_yslow;
+            if (!file_exists($file_yslow)) {
                 // yslow生成
-                mkdir(dirname($file_yslow), 0755, true);
-                exec($path . 'yslow --info basic --format plain ' . $file_har . ' > ' . $file_yslow);
+                if (!file_exists(dirname($file_yslow))) {
+                    mkdir(dirname($file_yslow), 0755, true);
+                }
+                exec('PATH=$PATH:' . $path . ' yslow --info basic --format plain ' . $file_har . ' > ' . $file_yslow);
             }
         }
         if (file_exists($file_content)) {

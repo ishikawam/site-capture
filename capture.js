@@ -46,26 +46,25 @@
                     img.append($('<img class="window">').attr('src', res.imageUrl));
 
                     if (res.yslowUrl) { // phantomに限る
-                        // 何度か来るので最初の1回のみ
-                        if (!$('#feed').text()) {
-                            $('#feed').append(' <a target="_blank" href="' + res.request.url + '">' + res.request.url + '</a> ');
-                        }
+                        $('#feed_url').html(' <a target="_blank" href="' + res.request.url + '">' + res.request.url + '</a> ');
 
-                        var yslow = $('<a class="toolhint" target="_blank">yslow(' + w + 'x' + h + ')<span id="toolhint_' + w + '_' + h +  '"></span></a>');
-                        yslow.click(res, function(event) {
-                            console.log(event);
+                        var device = getDevice(w, h);
+                        var yslow = $('<a class="toolhint" target="_blank">yslow(' + device + ')<span id="toolhint_' + device + '"></span></a>');
+
+                        yslow.click({res:res, device:device}, function(event) {
+                            // unbindしなくていいのかな
                             $.ajax({
                                 type: 'GET',
-                                url: event.data.yslowUrl,
+                                url: event.data.res.yslowUrl,
                                 timeout: 6*1000,
                                 success: function(res){
-                                    $('#toolhint_' + event.data.request.width + '_' + event.data.request.height).text(res);
-                                    $('#toolhint_' + event.data.request.width + '_' + event.data.request.height).addClass('toolhint');
+                                    $('#toolhint_' + event.data.device).text(res);
+                                    $('#toolhint_' + event.data.device).addClass('toolhint');
                                     console.log(res);
                                 }
                             });
                         });
-                        $('#feed').append(' , ').append(yslow);
+                        $('#feed_' + device).text(' , ').append(yslow);
                     }
 
                 } else {
@@ -77,12 +76,7 @@
                 console.log(['error', XMLHttpRequest, textStatus, errorThrown]);
                 $(id).html(''); // @todo; errorぽい画面出したい。テレビのノイズぽいの
 
-                var device = 'pc';
-                if (w / h < 0.6) {
-                    device = 'iphone';
-                } else if (w / h < 1) {
-                    device = 'ipad';
-                }
+                var device = getDevice(w, h);
                 var imageUrl = '/img/error_' + device + '.png';
                 var img = $('<img class="window">').attr('src', imageUrl);
                 $(id).html(img);
@@ -123,7 +117,12 @@
     $('#explain').html(str);
 
     var load = function() {
-        $('#feed').text('');
+        // リセット
+        $('#feed_url').text('');
+        $('#feed_pc').text('');
+        $('#feed_tablet').text('');
+        $('#feed_mobile').text('');
+
         var url = $('#url').val();
         location.hash = '#' + url;
         for (var key in engine) {
@@ -151,4 +150,14 @@
     if (location.hash) {
         $(window).hashchange();
     }
+
+    var getDevice = function(w, h) {
+        var device = 'pc';
+        if (w / h < 0.6) {
+            device = 'mobile';
+        } else if (w / h < 1) {
+            device = 'tablet';
+        }
+        return device;
+    };
 })();
