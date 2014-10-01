@@ -95,6 +95,10 @@ for ($i = 0; $i < 1000; $i ++) {
             $stmt_delete->execute(array(
                     'id' => $val['id'],
                 ));
+
+            // deleteなのでログを残す
+            file_put_contents('log/done_slimer_log', implode("\t", $val) . "\n", FILE_APPEND);
+
         } else if (preg_match('/^CasperError: null/', $output[0])) {
             $pdo->exec('update queue_slimer SET status = \'none\' where id = ' . $val['id']);
         } else {

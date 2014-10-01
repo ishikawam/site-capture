@@ -102,6 +102,8 @@ for ($i = 0; $i < 1000; $i ++) {
                             'id' => $val['id'],
                         ));
                     $flag = true;
+                    // deleteなのでログを残す
+                    file_put_contents('log/done_phantom_log', implode("\t", $val) . "\n", FILE_APPEND);
                     break;
                 } else if ($output2[1] == 'Error') {
                     echo("> !!!Error!!!\n");
