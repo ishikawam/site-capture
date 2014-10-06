@@ -67,6 +67,10 @@
                         $('#feed_' + device).text(' , ').append(yslow);
                     }
 
+                    if (res.contentUrl) { // phantomに限る
+                        $('#content_' + device).html(' , <a href="' + res.contentUrl + '" target="_blank">content(' + device + ')</a>');
+                    }
+
                 } else {
                     var img = $('<img class="window">').attr('src', res.imageUrl);
                 }

@@ -168,6 +168,7 @@ var RenderUrlsToFile = function(urls, callbackPerUrl, callbackFinal) {
             if (res.id == 1) {
                 // 対象ページと判断する＜ここにはページ内全要素のアクセス結果が来るので
                 console.log('PhantomStatus: ' + res.status); // null, 200, 301, とかかな
+                // これ、200でもlocation.hrefリダイレクトしてたら。。。意味ないね。 > http://dreamplus.asia/ とか
             }
             page.resources[res.id].endReply = res;
         }
@@ -181,25 +182,118 @@ var RenderUrlsToFile = function(urls, callbackPerUrl, callbackFinal) {
         var file_har = 'har/'+ dir + '/' + url_sha1.substr(0, 2) + '/' + url_sha1;
         var file_content = 'content/'+ dir + '/' + url_sha1.substr(0, 2) + '/' + url_sha1 + '.html';
 
-        page.evaluate(function() {
-            // 透過の場合用 背景を白に
-            document.body.bgColor = 'white';
-        });
 
         if (status === 'success') {
+
+            // 成功してからもlocation.hrefリダイレクトとかの対応のため遅延させる
             return window.setTimeout((function() {
-                page.render(file);
-                page.endTime = new Date();
-                page.title = page.evaluate(function () {
-                    return document.title;
+
+                page.evaluate(function() {
+                    // 透過の場合用 背景を白に
+                    document.body.bgColor = 'white';
                 });
-                har = createHAR(url, page);
-                fs.write(file_har, JSON.stringify(har, undefined, 4));
 
-                fs.write(file_content, page.content);
+                /**
+                 * viewport判定する
+                 * ex) width=device-width, initial-scale=1.0
+                 * なにもないと、320/980 に縮小される
+                 * 以下、上から優先
+                 * minimum-scale: 980pxに対して。0.33以上から影響あり
+                 * maximum-scale: 980pxに対して。0.32以下から影響あり
+                 * initial-scale: 初期サイズ。1で width=device-width。 0.33
+                 * width もろ影響。pxも数字も同じ。device-width だとiphoneは320px、ipadは768px。
+                 * 最小値、最大値はwidth 64px - 1280px
+                 */
 
-                return next(status, url, file);
-            }), 4000); // 開いて2秒後がだいたい整っていると判断。あと、これしないとJSでリダイレクトの場合何も取れない。@todo; あとそもそもメモリ足りてない
+                if (user_agent.match(/iPhone/) || user_agent.match(/iPad/)) {
+                    page.meta_viewport = page.evaluate(function () {
+                        // <meta name="viewport">を取得
+                        var meta = document.getElementsByName('viewport').item(0);
+                        if (meta) {
+                            return meta.content;
+                        }
+                        return '';
+                    });
+
+                    console.log('meta_viewport: ' + page.meta_viewport);
+
+                    var device_width = 320;
+                    if (user_agent.match(/iPad/)) {
+                        device_width = 768;
+                    }
+
+                    var viewport_width = 980;
+                    page.viewportarray = {
+                        width: page.meta_viewport.match(/width *= *([0-9a-zA-Z_\-\.]*)/),
+                        initial: page.meta_viewport.match(/initial-scale *= *([0-9a-zA-Z_\-\.]*)/),
+                        minimum: page.meta_viewport.match(/minimum-scale *= *([0-9a-zA-Z_\-\.]*)/),
+                        maximum: page.meta_viewport.match(/maximum-scale *= *([0-9a-zA-Z_\-\.]*)/),
+                    };
+                    page.viewportarray = {
+                        width: page.viewportarray.width ? page.viewportarray.width[1] : '',
+                        initial: page.viewportarray.initial ? page.viewportarray.initial[1] : '',
+                        minimum: page.viewportarray.minimum ? page.viewportarray.minimum[1] : '',
+                        maximum: page.viewportarray.maximum ? page.viewportarray.maximum[1] : '',
+                    };
+                    page.viewportarray.width = page.viewportarray.width.replace(/ *px$/, '');
+
+                    if (page.viewportarray.width === 'device-width') {
+                        viewport_width = device_width;
+                    } else if (page.viewportarray.width === '0' || Number(page.viewportarray.width)) {
+                        // 0も機能するのでこの判定
+                        viewport_width = page.viewportarray.width;
+                    }
+
+                    if (page.viewportarray.initial === '0' || Number(page.viewportarray.initial)) {
+                        // initialがあるとwidthは無視される
+                        viewport_width = device_width / page.viewportarray.initial;
+                    }
+
+                    // minimum > maximum 等不整合が会った場合は minimum が優先
+                    if (page.viewportarray.maximum === '0' || Number(page.viewportarray.maximum)) {
+                        if (viewport_width > device_width / page.viewportarray.maximum) {
+                            viewport_width = device_width / page.viewportarray.maximum;
+                        }
+                    }
+
+                    if (page.viewportarray.minimum === '0' || Number(page.viewportarray.minimum)) {
+                        if (viewport_width < device_width / page.viewportarray.minimum) {
+                            viewport_width = device_width / page.viewportarray.minimum;
+                        }
+                    }
+
+                    // 最大値最小値制限
+                    if (viewport_width < 64) {
+                        viewport_width = 64;
+                    } else if (viewport_width > 1280) {
+                        viewport_width = 1280;
+                    }
+
+                    var viewport_height = page.viewportSize.height * viewport_width / page.viewportSize.width;
+
+                    page.zoomFactor = page.viewportSize.width / viewport_width;
+
+                    console.log('zoom: ' + page.zoomFactor);
+                    console.log([page.viewportSize.width, viewport_width]);
+                }
+
+                return window.setTimeout((function() {
+
+                    page.render(file); // レンダリング
+
+                    page.endTime = new Date();
+                    page.title = page.evaluate(function () {
+                        return document.title;
+                    });
+
+                    har = createHAR(url, page);
+                    fs.write(file_har, JSON.stringify(har, undefined, 4));
+
+                    fs.write(file_content, page.content);
+
+                    return next(status, url, file);
+                }), 1000); // 開いて2秒後がだいたい整っていると判断。
+            }), 1000); // こっちはlocation.hrefリダイレクト用
         } else {
             return next(status, url, file);
         }

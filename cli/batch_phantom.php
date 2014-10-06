@@ -23,7 +23,7 @@ foreach ($output as $val) {
         $count ++;
     }
 }
-if ($count > 1) { // phantomは同時起動3つくらい？
+if ($count > 2) { // phantomは同時起動3つくらい？
     var_dump($output);
     exit;
 }
@@ -86,6 +86,12 @@ for ($i = 0; $i < 1000; $i ++) {
         exec($str, $output); // 取得処理
 
         echo(implode("\n", $output) . "\n\n");
+
+        // log
+        file_put_contents('log/batch_phantom_log',
+            date('---- Y-m-d H:i:s ----') . "\n" . $str . "\n" . implode("\n", $output) . "\n",
+            FILE_APPEND
+        );
 
         $flag = false;
         foreach ($output as $line) {
