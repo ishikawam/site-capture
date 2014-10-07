@@ -12,7 +12,9 @@
 var system = require('system');
 var fs = require('fs');
 var sha1 = fs.read('bower_components/cryptojslib/rollups/sha1.js');
-eval(sha1);
+eval(sha1); //よくないね
+var viewport_zoom = fs.read('lib/ViewportZoom/ViewportZoom.js');
+eval(viewport_zoom); //よくないね
 
 var urls = null;
 if (system.args.length > 4) {
@@ -58,7 +60,7 @@ var file = 'render/' + engine + '/' + dir + '/' + url_sha1.substr(0, 2) + '/' + 
 
 //casper.open(url).then(function() {
 casper.open(url).viewport(width, height).then(function() {
-//    this.echo(this.getTitle());
+    this.echo(this.getTitle());
 
     status_code = this.status().currentHTTPStatus;
 
@@ -71,10 +73,24 @@ casper.open(url).viewport(width, height).then(function() {
     // 301, 302, 200, が成功っぽい。他が来た時は？とりあえずログに残す
     this.echo('CasperOk: ' + status_code);
 
-    this.page.evaluate(function() {
+    var meta_viewport = this.page.evaluate(function() {
         // phantomjs: 透過の場合用 背景を白に
         document.body.bgColor = 'white';
+
+        var meta = document.getElementsByName('viewport').item(0);
+        if (meta) {
+            return meta.content;
+        }
+        return '';
     });
+
+    console.log('meta_viewport: ' + meta_viewport);
+
+    var zoomFactor = ViewportZoom.get(width, meta_viewport);
+
+    console.log('zoom: ' + zoomFactor);
+
+    this.zoom(zoomFactor);
 
     this.capture(file, {
         // トリミング

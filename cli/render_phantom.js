@@ -12,6 +12,7 @@
 var system = require('system');
 var fs = require('fs');
 phantom.injectJs('bower_components/cryptojslib/rollups/sha1.js');
+phantom.injectJs('lib/ViewportZoom/ViewportZoom.js');
 
 var webpage = require('webpage');
 
@@ -193,18 +194,7 @@ var RenderUrlsToFile = function(urls, callbackPerUrl, callbackFinal) {
                     document.body.bgColor = 'white';
                 });
 
-                /**
-                 * viewport判定する
-                 * ex) width=device-width, initial-scale=1.0
-                 * なにもないと、320/980 に縮小される
-                 * 以下、上から優先
-                 * minimum-scale: 980pxに対して。0.33以上から影響あり
-                 * maximum-scale: 980pxに対して。0.32以下から影響あり
-                 * initial-scale: 初期サイズ。1で width=device-width。 0.33
-                 * width もろ影響。pxも数字も同じ。device-width だとiphoneは320px、ipadは768px。
-                 * 最小値、最大値はwidth 64px - 1280px
-                 */
-
+                // viewport判定
                 if (user_agent.match(/iPhone/) || user_agent.match(/iPad/)) {
                     page.meta_viewport = page.evaluate(function () {
                         // <meta name="viewport">を取得
@@ -217,64 +207,9 @@ var RenderUrlsToFile = function(urls, callbackPerUrl, callbackFinal) {
 
                     console.log('meta_viewport: ' + page.meta_viewport);
 
-                    var device_width = 320;
-                    if (user_agent.match(/iPad/)) {
-                        device_width = 768;
-                    }
-
-                    var viewport_width = 980;
-                    page.viewportarray = {
-                        width: page.meta_viewport.match(/width *= *([0-9a-zA-Z_\-\.]*)/),
-                        initial: page.meta_viewport.match(/initial-scale *= *([0-9a-zA-Z_\-\.]*)/),
-                        minimum: page.meta_viewport.match(/minimum-scale *= *([0-9a-zA-Z_\-\.]*)/),
-                        maximum: page.meta_viewport.match(/maximum-scale *= *([0-9a-zA-Z_\-\.]*)/),
-                    };
-                    page.viewportarray = {
-                        width: page.viewportarray.width ? page.viewportarray.width[1] : '',
-                        initial: page.viewportarray.initial ? page.viewportarray.initial[1] : '',
-                        minimum: page.viewportarray.minimum ? page.viewportarray.minimum[1] : '',
-                        maximum: page.viewportarray.maximum ? page.viewportarray.maximum[1] : '',
-                    };
-                    page.viewportarray.width = page.viewportarray.width.replace(/ *px$/, '');
-
-                    if (page.viewportarray.width === 'device-width') {
-                        viewport_width = device_width;
-                    } else if (page.viewportarray.width === '0' || Number(page.viewportarray.width)) {
-                        // 0も機能するのでこの判定
-                        viewport_width = page.viewportarray.width;
-                    }
-
-                    if (page.viewportarray.initial === '0' || Number(page.viewportarray.initial)) {
-                        // initialがあるとwidthは無視される
-                        viewport_width = device_width / page.viewportarray.initial;
-                    }
-
-                    // minimum > maximum 等不整合が会った場合は minimum が優先
-                    if (page.viewportarray.maximum === '0' || Number(page.viewportarray.maximum)) {
-                        if (viewport_width > device_width / page.viewportarray.maximum) {
-                            viewport_width = device_width / page.viewportarray.maximum;
-                        }
-                    }
-
-                    if (page.viewportarray.minimum === '0' || Number(page.viewportarray.minimum)) {
-                        if (viewport_width < device_width / page.viewportarray.minimum) {
-                            viewport_width = device_width / page.viewportarray.minimum;
-                        }
-                    }
-
-                    // 最大値最小値制限
-                    if (viewport_width < 64) {
-                        viewport_width = 64;
-                    } else if (viewport_width > 1280) {
-                        viewport_width = 1280;
-                    }
-
-                    var viewport_height = page.viewportSize.height * viewport_width / page.viewportSize.width;
-
-                    page.zoomFactor = page.viewportSize.width / viewport_width;
+                    page.zoomFactor = ViewportZoom.get(width, page.meta_viewport);
 
                     console.log('zoom: ' + page.zoomFactor);
-                    console.log([page.viewportSize.width, viewport_width]);
                 }
 
                 return window.setTimeout((function() {
