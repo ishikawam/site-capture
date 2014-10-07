@@ -11,9 +11,10 @@
         }
 
         var server = 'http://capture.osae.me';
+        var engine_type = engine;
         if (engine.match(/^mac/)) {
             server = 'http://jitaku.osae.me:28080';
-            engine = engine.replace(/^mac/, '');
+            engine_type = engine.replace(/^mac/, '');
         }
 
         start_time = new Date/1000;
@@ -30,7 +31,7 @@
                 w: w,
                 h: h,
                 ua: ua,
-                e: engine // phantom or slimer
+                e: engine_type // phantom or slimer
             },
             timeout: 60*1000,
             success: function(res){
