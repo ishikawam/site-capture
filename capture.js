@@ -4,10 +4,16 @@
  */
 (function(){
     var lock = [];
+    var count = [];
     var url;
     var cap = function(id, w, h, ua, engine, cont){
         if (lock[id]) {
             return;
+        }
+        if (count[id]) {
+            count[id]++;
+        } else {
+            count[id] = 1;
         }
 
         var server = 'http://capture.osae.me';
@@ -22,7 +28,7 @@
             $(id).append('<div class="loading"><img src="img/gif-load-blue.gif"></div>');
             url = $('#url').val();
         }
-        console.log([url, id, w, h, ua]);
+//        console.log([url, id, w, h, ua]);
         $.ajax({
             type: 'POST',
             url: server + '/capture.php',
@@ -36,16 +42,28 @@
             timeout: 60*1000,
             success: function(res){
 //                console.log(this.data);
-                console.log(res);
+//                console.log(res);
                 if (res.status === 'error') {
 //                    console.log(['error', res.result, res.command]);
-                    $(id).html(''); // @todo; errorぽい画面出したい。テレビのノイズぽいの
+                    var device = getDevice(w, h);
+                    var imageUrl = '/img/error_' + device + '.png';
+                    var img = $('<img class="window">').attr('src', imageUrl);
+                    $(id).html(img);
+                    return;
                 } else if (res.status === 'wait') {
 //                    console.log(['waiting...', res.result, res.command]);
-                    console.log([url,w,h,ua,engine,id]);
-                    setTimeout(function() {
-                        cap(id, w, h, ua, engine, true);
-                    }, 1000);
+                    console.log(['waiting...' + count[id], url,w,h,ua,engine,id]);
+                    if (count[id] < 60) {
+                        setTimeout(function() {
+                            cap(id, w, h, ua, engine, true);
+                        }, 1000);
+                    } else {
+                        // timeout error
+                        var device = getDevice(w, h);
+                        var imageUrl = '/img/error_' + device + '.png';
+                        var img = $('<img class="window">').attr('src', imageUrl);
+                        $(id).html(img);
+                    }
                     return;
                 }
                 if (res.status == 'ok' || res.status == 'cache') {
@@ -85,15 +103,13 @@
             },
             error: function(XMLHttpRequest, textStatus, errorThrown){
                 console.log(['error', XMLHttpRequest, textStatus, errorThrown]);
-                $(id).html(''); // @todo; errorぽい画面出したい。テレビのノイズぽいの
-
                 var device = getDevice(w, h);
                 var imageUrl = '/img/error_' + device + '.png';
                 var img = $('<img class="window">').attr('src', imageUrl);
                 $(id).html(img);
             },
             complete: function(data){
-                console.log('finish ' + ((new Date/1000) - start_time));
+//                console.log('finish ' + ((new Date/1000) - start_time));
                 lock[id] = false; // ここのロック見直したい @todo;
             }
         });
@@ -139,17 +155,31 @@
 
         for (var key in engine) {
             for (var target in config) {
-                cap('#image_' + engine[key] + '_' + target, config[target].width, config[target].height, config[target].ua, engine[key]);
+                if ($('#url').val()) {
+                    cap('#image_' + engine[key] + '_' + target, config[target].width, config[target].height, config[target].ua, engine[key]);
+                } else {
+                    $('#image_' + engine[key] + '_' + target).html('');
+                }
             }
         }
     }
 
     $('#captureBtn').click(function(){
-        location.hash = '#' + $('#url').val();
+        if (location.hash.replace(/^#/, '') == $('#url').val()) {
+            // reload
+            $(window).hashchange();
+        } else {
+            location.hash = '#' + $('#url').val();
+        }
     });
     $('#url').keypress(function(e){
         if ((e.which && e.which == 13) || (e.keyCode && e.keyCode == 13)) {
-            location.hash = '#' + $('#url').val();
+            if (location.hash.replace(/^#/, '') == $('#url').val()) {
+                // reload
+                $(window).hashchange();
+            } else {
+                location.hash = '#' + $('#url').val();
+            }
         }
     });
 

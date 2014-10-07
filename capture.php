@@ -14,6 +14,8 @@
 ini_set('display_errors', 1);
 ini_set('error_reporting', E_ALL & ~E_NOTICE);
 
+//header('Access-Control-Allow-Origin: *'); //crossdomainを許容
+
 $path = ''; // mac
 if (exec('uname') == 'Linux') {
     $path = '/home/m_ishikawa/.nvm/v0.10.22/bin/';
@@ -172,6 +174,5 @@ if ($type == 'image') {
     header('Location: ' . $imageUrl);
 } else {
     header('Content-Type: application/json; charset=utf-8');
-    header('Access-Control-Allow-Origin: *'); //crossdomainを許容
     echo json_encode($return);
 }
