@@ -172,5 +172,6 @@ if ($type == 'image') {
     header('Location: ' . $imageUrl);
 } else {
     header('Content-Type: application/json; charset=utf-8');
+    header('Access-Control-Allow-Origin: *'); //crossdomainを許容
     echo json_encode($return);
 }

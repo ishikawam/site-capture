@@ -1,6 +1,6 @@
 /**
- * @todo;
- * 各種を並列で取ってきて欲しいのにできてない
+ * capture.js
+ *
  */
 (function(){
     var lock = [];
@@ -8,6 +8,12 @@
     var cap = function(id, w, h, ua, engine, cont){
         if (lock[id]) {
             return;
+        }
+
+        var server = 'http://capture.osae.me';
+        if (engine.match(/^mac/)) {
+            server = 'http://jitaku.osae.me:28080';
+            engine = engine.replace(/^mac/, '');
         }
 
         start_time = new Date/1000;
@@ -18,7 +24,7 @@
         console.log([url, id, w, h, ua]);
         $.ajax({
             type: 'POST',
-            url: '/capture.php',
+            url: server + '/capture.php',
             data: {
                 url: url,
                 w: w,
@@ -112,7 +118,7 @@
         },
     };
 
-    var engine = ['phantom', 'slimer'];
+    var engine = ['phantom', 'macphantom', 'slimer', 'macslimer'];
 
     var str = '';
     for (var target in config) {
@@ -126,9 +132,10 @@
         $('#feed_pc').text('');
         $('#feed_tablet').text('');
         $('#feed_mobile').text('');
+        $('#content_pc').text('');
+        $('#content_tablet').text('');
+        $('#content_mobile').text('');
 
-        var url = $('#url').val();
-        location.hash = '#' + url;
         for (var key in engine) {
             for (var target in config) {
                 cap('#image_' + engine[key] + '_' + target, config[target].width, config[target].height, config[target].ua, engine[key]);
@@ -137,11 +144,11 @@
     }
 
     $('#captureBtn').click(function(){
-        load();
+        location.hash = '#' + $('#url').val();
     });
     $('#url').keypress(function(e){
         if ((e.which && e.which == 13) || (e.keyCode && e.keyCode == 13)) {
-            load();
+            location.hash = '#' + $('#url').val();
         }
     });
 

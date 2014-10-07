@@ -5,9 +5,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="description" content="">
         <meta name="author" content="">
-        <link rel="icon" href="../../favicon.ico">
+        <link rel="icon" href="/favicon.ico">
 
-        <title>Phantomjs capture test</title>
+        <title>Capture test</title>
 
         <!-- Bootstrap core CSS -->
         <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -48,50 +48,51 @@
               <span id="feed_pc"></span><span id="feed_tablet"></span><span id="feed_mobile"></span>
               <span id="content_pc"></span><span id="content_tablet"></span><span id="content_mobile"></span>
             </p>
+<?php
+$list = array(
+    array(
+        'title' => 'Linux:Phantomjs',
+        'name' => 'phantom',
+    ),
+    array(
+        'title' => 'Mac:Phantomjs',
+        'name' => 'macphantom',
+    ),
+    array(
+        'title' => 'Linux:Slimerjs (via Casperjs)',
+        'name' => 'slimer',
+    ),
+    array(
+        'title' => 'Mac:Slimerjs (via Casperjs)',
+        'name' => 'macslimer',
+    ),
+);
+foreach($list as $val) {
+?>
             <div class="starter-template sub">
                 <p class="lead">
-                    Phantomjs
+                    <?=$val['title']?>
                 </p>
             </div>
             <div class="row center">
                 <div class="imageWrap">
                     <div class="imageWrapPc">
                         <p>pc</p>
-                        <div id="image_phantom_pc" class="imagePc"></div>
+                        <div id="image_<?=$val['name']?>_pc" class="imagePc"></div>
                     </div>
                     <div class="imageWrapTablet">
                         <p>tablet</p>
-                        <div id="image_phantom_tablet" class="imageTablet"></div>
+                        <div id="image_<?=$val['name']?>_tablet" class="imageTablet"></div>
                     </div>
                     <div class="imageWrapMobile">
                         <p>mobile</p>
-                        <div id="image_phantom_mobile" class="imageMobile"></div>
+                        <div id="image_<?=$val['name']?>_mobile" class="imageMobile"></div>
                     </div>
                 </div>
             </div>
-
-            <div class="starter-template sub">
-                <p class="lead">
-                    Slimerjs (via Casperjs)
-                </p>
-            </div>
-            <div class="row center">
-                <div class="imageWrap">
-                    <div class="imageWrapPc">
-                        <p>pc</p>
-                        <div id="image_slimer_pc" class="imagePc"></div>
-                    </div>
-                    <div class="imageWrapTablet">
-                        <p>tablet</p>
-                        <div id="image_slimer_tablet" class="imageTablet"></div>
-                    </div>
-                    <div class="imageWrapMobile">
-                        <p>mobile</p>
-                        <div id="image_slimer_mobile" class="imageMobile"></div>
-                    </div>
-                </div>
-            </div>
-
+<?php
+}
+?>
             <div id="explain" class="row">
             </div>
             <div class="row">

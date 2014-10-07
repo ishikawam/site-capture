@@ -43,7 +43,7 @@ var casper = require('casper').create({
 
 casper.start();
 
-casper.wait(2000); // 2秒のDelay
+casper.wait(3000); // 3秒のDelay必要
 
 if (user_agent) {
     casper.userAgent(user_agent);
