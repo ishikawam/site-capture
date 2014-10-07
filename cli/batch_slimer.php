@@ -90,18 +90,26 @@ for ($i = 0; $i < 1000; $i ++) {
 
         echo('> ' . implode("\n", $output) . "\n");
 
-        if (preg_match('/^CasperOk:/', $output[0])) {
-            $stmt_delete = $pdo->prepare('delete from queue_slimer where id=:id');
-            $stmt_delete->execute(array(
-                    'id' => $val['id'],
-                ));
+        $flag = false;
+        foreach ($output as $line) {
+            if (preg_match('/^CasperOk:/', $line)) {
+                $stmt_delete = $pdo->prepare('delete from queue_slimer where id=:id');
+                $stmt_delete->execute(array(
+                        'id' => $val['id'],
+                    ));
 
-            // deleteなのでログを残す
-            file_put_contents('log/done_slimer_log', implode("\t", $val) . "\n", FILE_APPEND);
+                // deleteなのでログを残す
+                file_put_contents('log/done_slimer_log', implode("\t", $val) . "\n", FILE_APPEND);
+                $flag = true;
+                break;
 
-        } else if (preg_match('/^CasperError: null/', $output[0])) {
-            $pdo->exec('update queue_slimer SET status = \'none\' where id = ' . $val['id']);
-        } else {
+            } else if (preg_match('/^CasperError: null/', $line)) {
+                $pdo->exec('update queue_slimer SET status = \'none\' where id = ' . $val['id']);
+                $flag = true;
+                break;
+            }
+        }
+        if (!$flag) {
             echo("!!!Error!!!\n");
             // DISPLAYがおかしいとかの理由でslimerjsが機能していないかも
             $pdo->exec('update queue_slimer SET status = \'error\' where id = ' . $val['id']);

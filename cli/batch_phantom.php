@@ -96,7 +96,7 @@ for ($i = 0; $i < 1000; $i ++) {
         $flag = false;
         foreach ($output as $line) {
             $output2 = array();
-            if (preg_match('/Phantom([^:]*):(.*)/', $line, $output2)) {
+            if (preg_match('/^Phantom([^:]*):(.*)/', $line, $output2)) {
                 if ($output2[1] == 'Status' && trim($output2[2]) == '404') {
                     // phantomはnot found画像を記録しちゃう？？？わからん
                     $pdo->exec('update queue_phantom SET status = \'none\' where id = ' . $val['id']);

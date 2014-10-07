@@ -12,7 +12,7 @@
 var system = require('system');
 var fs = require('fs');
 phantom.injectJs('bower_components/cryptojslib/rollups/sha1.js');
-phantom.injectJs('lib/ViewportZoom/ViewportZoom.js');
+phantom.injectJs('bower_components/viewport-zoom/ViewportZoom.js');
 
 var webpage = require('webpage');
 

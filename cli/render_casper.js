@@ -13,7 +13,7 @@ var system = require('system');
 var fs = require('fs');
 var sha1 = fs.read('bower_components/cryptojslib/rollups/sha1.js');
 eval(sha1); //よくないね
-var viewport_zoom = fs.read('lib/ViewportZoom/ViewportZoom.js');
+var viewport_zoom = fs.read('bower_components/viewport-zoom/ViewportZoom.js');
 eval(viewport_zoom); //よくないね
 
 var urls = null;
@@ -43,7 +43,7 @@ var casper = require('casper').create({
 
 casper.start();
 
-casper.wait(3000); // 3秒のDelay
+casper.wait(2000); // 2秒のDelay
 
 if (user_agent) {
     casper.userAgent(user_agent);
@@ -84,13 +84,15 @@ casper.open(url).viewport(width, height).then(function() {
         return '';
     });
 
-    console.log('meta_viewport: ' + meta_viewport);
+    if (user_agent.match(/iPhone/) || user_agent.match(/iPad/)) {
+        console.log('meta_viewport: ' + meta_viewport);
 
-    var zoomFactor = ViewportZoom.get(width, meta_viewport);
+        var zoomFactor = ViewportZoom.get(width, meta_viewport);
 
-    console.log('zoom: ' + zoomFactor);
+        console.log('zoom: ' + zoomFactor);
 
-    this.zoom(zoomFactor);
+        this.zoom(zoomFactor);
+    }
 
     this.capture(file, {
         // トリミング
@@ -102,4 +104,3 @@ casper.open(url).viewport(width, height).then(function() {
 });
 
 casper.run();
-
