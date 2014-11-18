@@ -1,6 +1,6 @@
 <?php
 /**
- * キューのerror, none, busy, を定期的に掃除する
+ * DB キューのerror, none, busy, を定期的に掃除する
  *
  */
 

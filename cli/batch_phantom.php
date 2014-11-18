@@ -7,7 +7,8 @@
 include(__DIR__ . '/../inc/common.php');
 $common = new Common;
 
-$path = __DIR__ . '/../node_modules/.bin/';
+chdir(__DIR__ . '/../www/');
+$path = $common->config['path'];
 
 usleep(mt_rand(0,1000000)); // 同時起動をずらす
 
@@ -29,7 +30,7 @@ $return = array();
 
 $engine = 'phantom';
 
-$command = $path . 'phantomjs ' . __DIR__ .'/render_phantom.js';
+$command = 'PATH=$PATH:' . $path . ' phantomjs ' . __DIR__ .'/render_phantom.js';
 //$command = $path . 'casperjs --engine=phantomjs cli/render_casper.js phantom';
 
 // DB

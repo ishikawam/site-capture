@@ -11,6 +11,13 @@ date_default_timezone_set('Asia/Tokyo');
 class Common
 {
     public $config = array(
+        'path' => array(
+            // casperjs, phantomjs, slimerjs
+            '__DIR__/../node_modules/.bin',
+            // node
+            '/Users/tp-dayama/.nvm/v0.10.33/bin',
+        ),
+
         'database' => array(
             // @todo;
         ),
@@ -63,18 +70,23 @@ class Common
                 'type' => 'slimer',
                 'server' => 'http://capture.osae.me'
             ),
+*/
             array(
                 'title' => 'Mac:Slimerjs (via Casperjs)',
                 'name' => 'macslimer',
                 'type' => 'slimer',
                 'server' => 'http://homej.didit.jp'
             ),
-*/
         ),
     );
 
     public function __construct()
     {
+        foreach ($this->config['path'] as &$path) {
+            $path = str_replace('__DIR__', __DIR__, $path);
+        }
+        $this->config['path'] = implode(':', $this->config['path']);
+
         // 無駄だけど、phpとjsで設定ファイルを共通化するためにアクセスのたび保存。。。いい方法はないものか
         // 内部用
         file_put_contents(__DIR__ . '/config.json', json_encode($this->config));

@@ -7,7 +7,8 @@
 include(__DIR__ . '/../inc/common.php');
 $common = new Common;
 
-$path = __DIR__ . '/../node_modules/.bin/';
+chdir(__DIR__ . '/../www/');
+$path = $common->config['path'];
 
 $display = ''; // mac
 if (exec('uname') == 'Linux') {
@@ -35,7 +36,7 @@ $return = array();
 
 $engine = 'slimer';
 
-$command = $display . $path . 'casperjs --engine=slimerjs ' .__DIR__ . '/render_casper.js slimer';
+$command = $display . ' PATH=$PATH:' . $path . ' casperjs --engine=slimerjs ' .__DIR__ . '/render_casper.js slimer';
 //$command = 'xvfb-run ' . $path . 'casperjs --engine=slimerjs cli/render_casper.js slimer'; // xvfb-runだと遅い。$DISPLAY使ったほうがいいなあ。GNOMEの。
 
 // DB
