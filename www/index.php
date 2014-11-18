@@ -1,3 +1,7 @@
+<?php
+include(__DIR__ . '/../inc/common.php');
+$common = new Common;
+?>
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -49,25 +53,7 @@
               <span id="content_pc"></span><span id="content_tablet"></span><span id="content_mobile"></span>
             </p>
 <?php
-$list = array(
-    array(
-        'title' => 'Linux:Phantomjs',
-        'name' => 'phantom',
-    ),
-    array(
-        'title' => 'Mac:Phantomjs',
-        'name' => 'macphantom',
-    ),
-    array(
-        'title' => 'Linux:Slimerjs (via Casperjs)',
-        'name' => 'slimer',
-    ),
-    array(
-        'title' => 'Mac:Slimerjs (via Casperjs)',
-        'name' => 'macslimer',
-    ),
-);
-foreach($list as $val) {
+foreach($common->config['list'] as $val) {
 ?>
             <div class="starter-template sub">
                 <p class="lead">
