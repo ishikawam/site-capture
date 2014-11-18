@@ -4,8 +4,8 @@
  *
  */
 
-ini_set('display_errors', 1);
-ini_set('error_reporting', E_ALL & ~E_NOTICE);
+include(__DIR__ . '/../inc/common.php');
+$common = new Common;
 
 // lock
 $output = array();
@@ -25,8 +25,10 @@ $return = array();
 
 // DB
 try {
+    $pdo = new PDO('mysql:host=localhost; dbname=capture; unix_socket=/tmp/mysql.sock', 'capture', '');
     $pdo = new PDO('mysql:host=localhost; dbname=capture', 'capture', '');
 } catch(PDOException $e) {
+    echo "error " . __LINE__ . "\n";
     var_dump($e->getMessage());
     exit;
 }

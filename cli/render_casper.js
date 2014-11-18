@@ -11,9 +11,9 @@
 
 var system = require('system');
 var fs = require('fs');
-var sha1 = fs.read('bower_components/cryptojslib/rollups/sha1.js');
+var sha1 = fs.read('../www/bower_components/cryptojslib/rollups/sha1.js');
 eval(sha1); //よくないね
-var viewport_zoom = fs.read('bower_components/viewport-zoom/ViewportZoom.js');
+var viewport_zoom = fs.read('../www/bower_components/viewport-zoom/ViewportZoom.js');
 eval(viewport_zoom); //よくないね
 
 var urls = null;

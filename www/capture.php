@@ -16,10 +16,7 @@ ini_set('error_reporting', E_ALL & ~E_NOTICE);
 
 //header('Access-Control-Allow-Origin: *'); //crossdomainを許容
 
-$path = ''; // mac
-if (exec('uname') == 'Linux') {
-    $path = '/home/m_ishikawa/.nvm/v0.10.22/bin/';
-}
+$path = __DIR__ . '/../node_modules/.bin/';
 
 $return = array();
 
@@ -89,7 +86,7 @@ if (!$force && file_exists($file)) {
                 if (!file_exists(dirname($file_yslow))) {
                     mkdir(dirname($file_yslow), 0755, true);
                 }
-                exec('PATH=$PATH:' . $path . ' yslow --info basic --format plain ' . $file_har . ' > ' . $file_yslow);
+                exec($path . 'yslow --info basic --format plain ' . $file_har . ' > ' . $file_yslow);
             }
         }
         if (file_exists($file_content)) {
@@ -129,8 +126,8 @@ if (!$force && file_exists($file)) {
         $status = 'wait';
 //        usleep(1000); // すぐDB読んでも反映されないので
 
-        // 取得スクリプトを起こす
-        exec('php cli/batch_' . $engine . '.php > /dev/null &');
+        // 取得スクリプトを起こす。batch_phantom.php or batch_slimer.php
+        exec('php ' . __DIR__ . '/../cli/batch_' . $engine . '.php > /dev/null &');
 
     } else {
         $status = $res['status'];

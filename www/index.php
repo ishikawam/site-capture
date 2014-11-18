@@ -53,7 +53,7 @@ $common = new Common;
               <span id="content_pc"></span><span id="content_tablet"></span><span id="content_mobile"></span>
             </p>
 <?php
-foreach($common->config['list'] as $val) {
+foreach($common->config['engines'] as $val) {
 ?>
             <div class="starter-template sub">
                 <p class="lead">

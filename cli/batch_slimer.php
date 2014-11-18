@@ -4,13 +4,13 @@
  *
  */
 
-ini_set('display_errors', 1);
-ini_set('error_reporting', E_ALL & ~E_NOTICE);
+include(__DIR__ . '/../inc/common.php');
+$common = new Common;
 
-$path = ''; // mac
+$path = __DIR__ . '/../node_modules/.bin/';
+
 $display = ''; // mac
 if (exec('uname') == 'Linux') {
-    $path = '/home/m_ishikawa/.nvm/v0.10.22/bin/';
     $display_num = ':14.0'; // @todo; 可変
     $display = 'DISPLAY=' . $display_num . ' ';
 }
@@ -35,13 +35,14 @@ $return = array();
 
 $engine = 'slimer';
 
-$command = $display . $path . 'casperjs --engine=slimerjs cli/render_casper.js slimer';
+$command = $display . $path . 'casperjs --engine=slimerjs ' .__DIR__ . '/render_casper.js slimer';
 //$command = 'xvfb-run ' . $path . 'casperjs --engine=slimerjs cli/render_casper.js slimer'; // xvfb-runだと遅い。$DISPLAY使ったほうがいいなあ。GNOMEの。
 
 // DB
 try {
-    $pdo = new PDO('mysql:host=localhost; dbname=capture', 'capture', '');
+    $pdo = new PDO('mysql:host=localhost; dbname=capture; unix_socket=/tmp/mysql.sock', 'capture', '');
 } catch(PDOException $e) {
+    echo "error " . __LINE__ . "\n";
     var_dump($e->getMessage());
     exit;
 }
@@ -81,7 +82,7 @@ for ($i = 0; $i < 1000; $i ++) {
 
         echo("$url ($width*$height) \n");
 
-        $file = 'render/' . $engine . '/' . substr(sha1($ua), 0, 16) . '_' . $width . '_' . $height . '/' . substr(sha1($url), 0, 2) . '/' . sha1($url) . '.png';
+        $file = __DIR__ . '/../www/render/' . $engine . '/' . substr(sha1($ua), 0, 16) . '_' . $width . '_' . $height . '/' . substr(sha1($url), 0, 2) . '/' . sha1($url) . '.png';
 
         $str = $command . ' ' . $url . ' ' . $width . ' ' . $height . ' \'' . $ua . '\'';
         $str .= ' 2>&1'; // エラーも渡す
@@ -99,7 +100,7 @@ for ($i = 0; $i < 1000; $i ++) {
                     ));
 
                 // deleteなのでログを残す
-                file_put_contents('log/done_slimer_log', implode("\t", $val) . "\n", FILE_APPEND);
+                file_put_contents(__DIR__ . '/../log/done_slimer_log', implode("\t", $val) . "\n", FILE_APPEND);
                 $flag = true;
                 break;
 

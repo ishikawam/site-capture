@@ -11,8 +11,8 @@
 
 var system = require('system');
 var fs = require('fs');
-phantom.injectJs('bower_components/cryptojslib/rollups/sha1.js');
-phantom.injectJs('bower_components/viewport-zoom/ViewportZoom.js');
+phantom.injectJs('../www/bower_components/cryptojslib/rollups/sha1.js');
+phantom.injectJs('../www/bower_components/viewport-zoom/ViewportZoom.js');
 
 var webpage = require('webpage');
 
@@ -27,7 +27,7 @@ if (!Date.prototype.toISOString) {
             pad(this.getMinutes()) + ':' +
             pad(this.getSeconds()) + '.' +
             ms(this.getMilliseconds()) + 'Z';
-    }
+    };
 }
 
 function createHAR(address, page)

@@ -4,13 +4,10 @@
  *
  */
 
-ini_set('display_errors', 1);
-ini_set('error_reporting', E_ALL & ~E_NOTICE);
+include(__DIR__ . '/../inc/common.php');
+$common = new Common;
 
-$path = ''; // mac
-if (exec('uname') == 'Linux') {
-    $path = '/home/m_ishikawa/.nvm/v0.10.22/bin/';
-}
+$path = __DIR__ . '/../node_modules/.bin/';
 
 usleep(mt_rand(0,1000000)); // 同時起動をずらす
 
@@ -32,13 +29,14 @@ $return = array();
 
 $engine = 'phantom';
 
-$command = 'phantomjs cli/render_phantom.js';
+$command = $path . 'phantomjs ' . __DIR__ .'/render_phantom.js';
 //$command = $path . 'casperjs --engine=phantomjs cli/render_casper.js phantom';
 
 // DB
 try {
-    $pdo = new PDO('mysql:host=localhost; dbname=capture', 'capture', '');
+    $pdo = new PDO('mysql:host=localhost; dbname=capture; unix_socket=/tmp/mysql.sock', 'capture', '');
 } catch(PDOException $e) {
+    echo "error " . __LINE__ . "\n";
     var_dump($e->getMessage());
     exit;
 }
@@ -78,7 +76,7 @@ for ($i = 0; $i < 1000; $i ++) {
 
         echo("$url ($width*$height) \n");
 
-        $file = 'render/' . $engine . '/' . substr(sha1($ua), 0, 16) . '_' . $width . '_' . $height . '/' . substr(sha1($url), 0, 2) . '/' . sha1($url) . '.png';
+        $file = __DIR__ . '/../www/render/' . $engine . '/' . substr(sha1($ua), 0, 16) . '_' . $width . '_' . $height . '/' . substr(sha1($url), 0, 2) . '/' . sha1($url) . '.png';
 
         $str = $command . ' ' . $url . ' ' . $width . ' ' . $height . ' \'' . $ua . '\'';
         $str .= ' 2>&1'; // エラーも渡す
@@ -88,7 +86,7 @@ for ($i = 0; $i < 1000; $i ++) {
         echo(implode("\n", $output) . "\n\n");
 
         // log
-        file_put_contents('log/batch_phantom_log',
+        file_put_contents(__DIR__ . '/../log/batch_phantom_log',
             date('---- Y-m-d H:i:s ----') . "\n" . $str . "\n" . implode("\n", $output) . "\n",
             FILE_APPEND
         );
@@ -109,7 +107,7 @@ for ($i = 0; $i < 1000; $i ++) {
                         ));
                     $flag = true;
                     // deleteなのでログを残す
-                    file_put_contents('log/done_phantom_log', implode("\t", $val) . "\n", FILE_APPEND);
+                    file_put_contents(__DIR__ . '/../log/done_phantom_log', implode("\t", $val) . "\n", FILE_APPEND);
                     break;
                 } else if ($output2[1] == 'Error') {
                     echo("> !!!Error!!!\n");

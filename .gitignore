@@ -1,9 +1,10 @@
 .DS_Store
 .sass-cache/
-bower_components/
-/render/
-/har/
-/content/
+/www/bower_components/
+/www/render/
+/www/har/
+/www/content/
+/www/yslow/
 /log/
-/yslow/
 /vendor/
+/node_modules/
