@@ -2,33 +2,28 @@
 /**
  * Web Page Capture API
  *
- * @todo; デフォルト値がrender...js, capture.jsと冗長しているので一元化したい
  * @todo; まだApacheもPHPもデフォルト。チューニングしなきゃ。
- * @todo; リダイレクトされたら取れない？？？
  * @todo; HARとか活用したい
- * @todo; viewport対応したい
  * @todo; トップページ以外も取れる仕様に。？制限もうけたり
  * @todo; エラー画像、Not Found画像、Now Printing画像、とか用意したい。
  */
 
-ini_set('display_errors', 1);
-ini_set('error_reporting', E_ALL & ~E_NOTICE);
+include(__DIR__ . '/../inc/common.php');
+$common = new Common;
 
-//header('Access-Control-Allow-Origin: *'); //crossdomainを許容
-
-$path = __DIR__ . '/../node_modules/.bin/';
+$path = $common->config['path'];
 
 $return = array();
 
-$url = trim($_REQUEST['url']);
-$width = trim($_REQUEST['w']) ? trim($_REQUEST['w']) : 1024;
-$height = trim($_REQUEST['h']) ? trim($_REQUEST['h']) : round($width*3/4);
-$ua = trim($_REQUEST['ua']) ? trim($_REQUEST['ua']) : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.94 Safari/537.36';
-$engine = trim($_REQUEST['e']) ? trim($_REQUEST['e']) : 'phantom'; // phantom, slimer
-$type = trim($_REQUEST['t']) ? trim($_REQUEST['t']) : 'json'; // json, redirect, image
-$force = trim($_REQUEST['f']) == true; // 取得
+$url = !empty($_REQUEST['url']) ? trim($_REQUEST['url']) : '';
+$width = !empty($_REQUEST['w']) ? trim($_REQUEST['w']) : 1024;
+$height = !empty($_REQUEST['h']) ? trim($_REQUEST['h']) : round($width*3/4);
+$ua = !empty($_REQUEST['ua']) ? trim($_REQUEST['ua']) : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.94 Safari/537.36';
+$engine = !empty($_REQUEST['e']) ? trim($_REQUEST['e']) : 'phantom'; // phantom, slimer
+$type = !empty($_REQUEST['t']) ? trim($_REQUEST['t']) : 'json'; // json, redirect, image
+$force = !empty($_REQUEST['f']) ? true : false; // 取得
 
-$force = false; // 今は制限
+$force = false; // 今は制限 @todo;
 
 $device = 'pc';
 if ($width / $height < 0.6) {
@@ -98,9 +93,9 @@ if (!$force && file_exists($file)) {
 
     // DB
     try {
-        $pdo = new PDO('mysql:host=localhost; dbname=capture', 'capture', '');
+        $pdo = new PDO($common->config['database']['db'], $common->config['database']['user'], $common->config['database']['password']);
     } catch(PDOException $e) {
-        var_dump($e->getMessage());
+        $common->logger("DB Error \n" . print_r($e->getMessage(), true), 'capture.php_log');
         exit;
     }
 

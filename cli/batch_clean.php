@@ -25,11 +25,9 @@ $return = array();
 
 // DB
 try {
-    $pdo = new PDO('mysql:host=localhost; dbname=capture; unix_socket=/tmp/mysql.sock', 'capture', '');
-    $pdo = new PDO('mysql:host=localhost; dbname=capture', 'capture', '');
+    $pdo = new PDO($common->config['database']['db'], $common->config['database']['user'], $common->config['database']['password']);
 } catch(PDOException $e) {
-    echo "error " . __LINE__ . "\n";
-    var_dump($e->getMessage());
+    $common->logger("DB Error \n" . print_r($e->getMessage(), true), 'batch_clean_log');
     exit;
 }
 
@@ -53,7 +51,7 @@ foreach ($config as $engine => $val) {
         $log = $stmt->fetchAll(PDO::FETCH_ASSOC);
         foreach ($log as $line) {
             $stmt = $pdo->exec('delete from queue_' . $engine . ' where id = \'' . $line['id'] . '\'');
-            file_put_contents('log/clean_log', implode("\t", $line) . "\n", FILE_APPEND);
+            $common->logger(implode("\t", $line), 'clean_log');
         }
     }
 }

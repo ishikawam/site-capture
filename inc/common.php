@@ -15,19 +15,20 @@ class Common
             // casperjs, phantomjs, slimerjs
             '__DIR__/../node_modules/.bin',
             // node
-            '/Users/tp-dayama/.nvm/v0.10.33/bin',
+            '~/.nvm/v0.10.33/bin', // mac
+            '~/.nvm/v0.10.31/bin', // fire
         ),
 
         'database' => array(
-            // @todo;
+            'db' => 'mysql:host=localhost; dbname=capture;', // fire
+//            'db' => 'mysql:host=localhost; dbname=capture; unix_socket=/tmp/mysql.sock' // mac
+            'user' => 'capture',
+            'password' => '',
         ),
 
-        'slimerjs' => array( // @todo; use
-            'display_num' => ':14.0', // @todo; 可変
-        ),
+        'display' => ':10.0', // @todo; 可変 for slimerjs
 
         'device' => array(
-            // @todo; 定数系はcapture.phpと共通で使いたい
             'pc' => array(
                 'width' => 1920,
                 'height' => 1080,
@@ -49,28 +50,24 @@ class Common
         ),
 
         'engines' => array(
-/*
             array(
                 'title' => 'Linux:Phantomjs',
                 'name' => 'phantom',
                 'type' => 'phantom',
                 'server' => 'http://capture.osae.me'
             ),
-*/
             array(
                 'title' => 'Mac:Phantomjs',
                 'name' => 'macphantom',
                 'type' => 'phantom',
                 'server' => 'http://homej.didit.jp'
             ),
-/*
             array(
                 'title' => 'Linux:Slimerjs (via Casperjs)',
                 'name' => 'linuxslimer',
                 'type' => 'slimer',
                 'server' => 'http://capture.osae.me'
             ),
-*/
             array(
                 'title' => 'Mac:Slimerjs (via Casperjs)',
                 'name' => 'macslimer',
@@ -90,7 +87,26 @@ class Common
         // 無駄だけど、phpとjsで設定ファイルを共通化するためにアクセスのたび保存。。。いい方法はないものか
         // 内部用
         file_put_contents(__DIR__ . '/config.json', json_encode($this->config));
+
         // 公開用
-        file_put_contents(__DIR__ . '/../www/config.json', json_encode($this->config));
+        file_put_contents(__DIR__ . '/../www/config.json', json_encode(
+                array(
+                    'device' => $this->config['device'],
+                    'engines' => $this->config['engines'],
+                )
+            ));
+    }
+
+    /**
+     * logger
+     *  - ロギングと表示と
+     * message: 文
+     * file: ログファイル。なければ表示のみ
+     */
+    public function logger($message, $file = '') {
+        echo $message . "\n";
+        if ($file) {
+            file_put_contents(__DIR__ . '/../log/' .$file, date('Y-m-d H:i:s	', time()) . $message. "\n", FILE_APPEND);
+        }
     }
 }

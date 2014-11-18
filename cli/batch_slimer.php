@@ -12,8 +12,7 @@ $path = $common->config['path'];
 
 $display = ''; // mac
 if (exec('uname') == 'Linux') {
-    $display_num = ':14.0'; // @todo; 可変
-    $display = 'DISPLAY=' . $display_num . ' ';
+    $display = 'DISPLAY=' . $common->config['display'] . ' '; // @todo; 可変
 }
 
 usleep(mt_rand(0,1000000)); // 同時起動をずらす
@@ -41,10 +40,9 @@ $command = $display . ' PATH=$PATH:' . $path . ' casperjs --engine=slimerjs ' ._
 
 // DB
 try {
-    $pdo = new PDO('mysql:host=localhost; dbname=capture; unix_socket=/tmp/mysql.sock', 'capture', '');
+    $pdo = new PDO($common->config['database']['db'], $common->config['database']['user'], $common->config['database']['password']);
 } catch(PDOException $e) {
-    echo "error " . __LINE__ . "\n";
-    var_dump($e->getMessage());
+    $common->logger("DB Error \n" . print_r($e->getMessage(), true), 'batch_slimer_log');
     exit;
 }
 
@@ -90,7 +88,7 @@ for ($i = 0; $i < 1000; $i ++) {
         $output = array();
         exec($str, $output); // 取得処理
 
-        echo('> ' . implode("\n", $output) . "\n");
+        $common->logger('> ' . implode("\n", $output), 'batch_slimer_log');
 
         $flag = false;
         foreach ($output as $line) {
@@ -101,7 +99,7 @@ for ($i = 0; $i < 1000; $i ++) {
                     ));
 
                 // deleteなのでログを残す
-                file_put_contents(__DIR__ . '/../log/done_slimer_log', implode("\t", $val) . "\n", FILE_APPEND);
+                $common->logger(implode("\t", $val), 'done_slimer_log');
                 $flag = true;
                 break;
 
@@ -112,7 +110,7 @@ for ($i = 0; $i < 1000; $i ++) {
             }
         }
         if (!$flag) {
-            echo("!!!Error!!!\n");
+            $common->logger('!!!Error!!! Display?', 'batch_slimer_log');
             // DISPLAYがおかしいとかの理由でslimerjsが機能していないかも
             $pdo->exec('update queue_slimer SET status = \'error\' where id = ' . $val['id']);
         }

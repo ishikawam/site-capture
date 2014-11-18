@@ -1,10 +1,15 @@
 .DS_Store
 .sass-cache/
+
 /www/bower_components/
 /www/render/
 /www/har/
 /www/content/
 /www/yslow/
+
+/inc/config.json
+/www/config.json
+
 /log/
 /vendor/
 /node_modules/

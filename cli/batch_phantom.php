@@ -35,10 +35,9 @@ $command = 'PATH=$PATH:' . $path . ' phantomjs ' . __DIR__ .'/render_phantom.js'
 
 // DB
 try {
-    $pdo = new PDO('mysql:host=localhost; dbname=capture; unix_socket=/tmp/mysql.sock', 'capture', '');
+    $pdo = new PDO($common->config['database']['db'], $common->config['database']['user'], $common->config['database']['password']);
 } catch(PDOException $e) {
-    echo "error " . __LINE__ . "\n";
-    var_dump($e->getMessage());
+    $common->logger("DB Error \n" . print_r($e->getMessage(), true), 'batch_phantom_log');
     exit;
 }
 
@@ -84,13 +83,7 @@ for ($i = 0; $i < 1000; $i ++) {
         $output = array();
         exec($str, $output); // 取得処理
 
-        echo(implode("\n", $output) . "\n\n");
-
-        // log
-        file_put_contents(__DIR__ . '/../log/batch_phantom_log',
-            date('---- Y-m-d H:i:s ----') . "\n" . $str . "\n" . implode("\n", $output) . "\n",
-            FILE_APPEND
-        );
+        $common->logger("\n" . $str . "\n" . implode("\n", $output), 'batch_phantom_log');
 
         $flag = false;
         foreach ($output as $line) {
@@ -108,10 +101,10 @@ for ($i = 0; $i < 1000; $i ++) {
                         ));
                     $flag = true;
                     // deleteなのでログを残す
-                    file_put_contents(__DIR__ . '/../log/done_phantom_log', implode("\t", $val) . "\n", FILE_APPEND);
+                    $common->logger(implode("\t", $val), 'done_phantom_log');
                     break;
                 } else if ($output2[1] == 'Error') {
-                    echo("> !!!Error!!!\n");
+                    $common->logger('> !!!Error!!!', 'batch_phantom_log');
                     $pdo->exec('update queue_phantom SET status = \'error\' where id = ' . $val['id']);
                     $flag = true;
                     break;
@@ -120,7 +113,7 @@ for ($i = 0; $i < 1000; $i ++) {
         }
         if (!$flag) {
             // Phantomが反応してない？
-            echo("> !!!Fatal Error!!!\n");
+            $common->logger('> !!!Fatal Error!!!', 'batch_phantom_log');
             $pdo->exec('update queue_phantom SET status = \'error\' where id = ' . $val['id']);
             $flag = true;
         }
