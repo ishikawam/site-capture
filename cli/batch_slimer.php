@@ -78,12 +78,13 @@ for ($i = 0; $i < 1000; $i ++) {
         $width = $val['width'];
         $height = $val['height'];
         $ua = $val['user_agent'];
+        $zoom = $val['zoom'];
 
         echo("$url ($width*$height) \n");
 
-        $file = __DIR__ . '/../www/render/' . $engine . '/' . substr(sha1($ua), 0, 16) . '_' . $width . '_' . $height . '/' . substr(sha1($url), 0, 2) . '/' . sha1($url) . '.png';
+        $file = __DIR__ . '/../www/render/' . $engine . '/' . substr(sha1($ua), 0, 16) . '_' . $width . '_' . $height . '_' . $zoom . '/' . substr(sha1($url), 0, 2) . '/' . sha1($url) . '.png';
 
-        $str = $command . ' ' . $url . ' ' . $width . ' ' . $height . ' \'' . $ua . '\'';
+        $str = $command . ' ' . $url . ' ' . $width . ' ' . $height . ' \'' . $ua . '\' ' . $zoom;
         $str .= ' 2>&1'; // エラーも渡す
         $output = array();
         exec($str, $output); // 取得処理
