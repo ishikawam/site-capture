@@ -30,11 +30,13 @@ CREATE TABLE `queue_phantom` (
   `width` int(10) unsigned DEFAULT NULL,
   `height` int(10) unsigned DEFAULT NULL,
   `user_agent` varchar(256) DEFAULT NULL,
+  `zoom` tinyint(3) unsigned DEFAULT NULL,
+  `resize` tinyint(3) unsigned DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `ip` varchar(64) NOT NULL DEFAULT '' COMMENT 'BANするため',
   `status` varchar(10) NOT NULL DEFAULT '' COMMENT 'error, none, busy',
   PRIMARY KEY (`id`),
-  KEY `url` (`url`(255),`width`,`height`,`user_agent`(255)),
+  KEY `url` (`url`(255),`width`,`height`,`user_agent`(255),`zoom`,`resize`),
   KEY `status` (`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -45,10 +47,12 @@ CREATE TABLE `queue_slimer` (
   `width` int(10) unsigned DEFAULT NULL,
   `height` int(10) unsigned DEFAULT NULL,
   `user_agent` varchar(256) DEFAULT NULL,
+  `zoom` tinyint(3) unsigned DEFAULT NULL,
+  `resize` tinyint(3) unsigned DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `ip` varchar(64) NOT NULL DEFAULT '' COMMENT 'BANするため',
   `status` varchar(10) NOT NULL DEFAULT '' COMMENT 'error, none, busy',
   PRIMARY KEY (`id`),
-  KEY `url` (`url`(255),`width`,`height`,`user_agent`(255)),
+  KEY `url` (`url`(255),`width`,`height`,`user_agent`(255),`zoom`,`resize`),
   KEY `status` (`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

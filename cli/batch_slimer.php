@@ -79,12 +79,13 @@ for ($i = 0; $i < 1000; $i ++) {
         $height = $val['height'];
         $ua = $val['user_agent'];
         $zoom = $val['zoom'];
+        $resize = $val['resize'];
 
         echo("$url ($width*$height) \n");
 
-        $file = __DIR__ . '/../www/render/' . $engine . '/' . substr(sha1($ua), 0, 16) . '_' . $width . '_' . $height . '_' . $zoom . '/' . substr(sha1($url), 0, 2) . '/' . sha1($url) . '.png';
+        $file = __DIR__ . '/../www/render/' . $engine . '/' . substr(sha1($ua), 0, 16) . '_' . $width . '_' . $height . '_' . $zoom . '_' . $resize . '/' . substr(sha1($url), 0, 2) . '/' . sha1($url) . '.png';
 
-        $str = $command . ' ' . $url . ' ' . $width . ' ' . $height . ' \'' . $ua . '\' ' . $zoom;
+        $str = $command . ' ' . $url . ' ' . $width . ' ' . $height . ' \'' . $ua . '\' ' . $zoom . ' ' . $resize;
         $str .= ' 2>&1'; // エラーも渡す
         $output = array();
         exec($str, $output); // 取得処理
@@ -114,6 +115,15 @@ for ($i = 0; $i < 1000; $i ++) {
             $common->logger('!!!Error!!! Display?', 'batch_slimer_log');
             // DISPLAYがおかしいとかの理由でslimerjsが機能していないかも
             $pdo->exec('update queue_slimer SET status = \'error\' where id = ' . $val['id']);
+        }
+
+        // 縮小
+        if ($resize != 100) {
+            $resize_width = $width * $resize * 0.01;
+            $image = new Imagick($file);
+            $image->thumbnailImage($resize_width, 0);
+            $image->writeImage($file);
+            $image->destroy();
         }
     }
 }

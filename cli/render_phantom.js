@@ -2,8 +2,8 @@
  * Phantom render URL to file
  *  (ref. render_multi_url.js, netsniff.js)
  * 成功すれば保存、失敗すれば何もしない。
- * 保存場所は sha1(user_agent)の先頭16文字+'_'+width+'_'+height+'_'+zoom+'/'+sha1(url)の先頭2文字+'/'+ sha1(url) .png
- * zoomは10〜200でパーセント表示
+ * 保存場所は sha1(user_agent)の先頭16文字+'_'+width+'_'+height+'_'+zoom+'_'+resize+'/'+sha1(url)の先頭2文字+'/'+ sha1(url) .png
+ * zoom, resizeは10〜200でパーセント表示
  * @todo; netsniff.js のHARを活用したい
  * @todo; リダイレクトされたらsuccessなのに保存されないぽい
  * @todo; やっぱり並列処理考えないと、現状はプロセス別に走ってるのに待っちゃう。。なんでかわからない。
@@ -132,6 +132,7 @@ var RenderUrlsToFile = function(urls, callbackPerUrl, callbackFinal) {
     var user_agent = urls[3] ? urls[3] : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_4) AppleWebKit/537.78.2 (KHTML, like Gecko) Version/7.0.6 Safari/537.78.2'; // mac safari 1024x768
 //    var user_agent = urls[3] ? urls[3] : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.94 Safari/537.36'; // mac chrome 1024x768
     var zoom = urls[4] ? urls[4] : 100;
+    var resize = urls[5] ? urls[5] : 100;
 
     page.viewportSize = {
         width: width,
@@ -183,7 +184,7 @@ var RenderUrlsToFile = function(urls, callbackPerUrl, callbackFinal) {
 
     return page.open(url, function(status) {
         // 保存ファイル名 sha1のprefix 2文字をディレクトリにして(gitと同じ)想定256*10000=200万サイトくらいかな
-        var dir = CryptoJS.SHA1(user_agent).toString().substr(0, 16) + '_' + width + '_' + height + '_' + zoom;
+        var dir = CryptoJS.SHA1(user_agent).toString().substr(0, 16) + '_' + width + '_' + height + '_' + zoom + '_' + resize;
         var url_sha1 = CryptoJS.SHA1(url).toString();
         var file = 'render/phantom/'+ dir + '/' + url_sha1.substr(0, 2) + '/' + url_sha1 + '.png';
         var file_har = 'har/'+ dir + '/' + url_sha1.substr(0, 2) + '/' + url_sha1;
@@ -246,7 +247,7 @@ var RenderUrlsToFile = function(urls, callbackPerUrl, callbackFinal) {
 var arrayOfUrls = null;
 
 if (system.args.length > 1) {
-    // 引数 1,url 2,width(デフォルト1024) 3,height(デフォルトwidth*3/4) 4, useragent(デフォルトMac) 5, zoom(デフォルト100)
+    // 引数 1,url 2,width(デフォルト1024) 3,height(デフォルトwidth*3/4) 4, useragent(デフォルトMac) 5, zoom(デフォルト100) 6, resize(デフォルト100)
     arrayOfUrls = Array.prototype.slice.call(system.args, 1);
 } else {
     console.log('PhantomError: invalid');

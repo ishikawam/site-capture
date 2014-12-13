@@ -9,6 +9,7 @@
  * h	height
  * ua	user agent
  * z	zoom
+ * s	resize (imagemagick)
  * [定義指定モード] @todo; 未実装
  * d	定義したデバイス名 (ex. pc, mobile, tablet)
  * [共通]
@@ -30,10 +31,11 @@ $path = $common->config['path'];
 $return = array();
 
 $url = !empty($_REQUEST['url']) ? trim($_REQUEST['url']) : '';
-$width = !empty($_REQUEST['w']) ? trim($_REQUEST['w']) : 1024;
-$height = !empty($_REQUEST['h']) ? trim($_REQUEST['h']) : round($width*3/4);
+$width = !empty($_REQUEST['w']) ? (int)trim($_REQUEST['w']) : 1024;
+$height = !empty($_REQUEST['h']) ? (int)trim($_REQUEST['h']) : round($width*3/4);
 $ua = !empty($_REQUEST['ua']) ? trim($_REQUEST['ua']) : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.94 Safari/537.36';
-$zoom = !empty($_REQUEST['z']) ? trim($_REQUEST['z']) : 100;
+$zoom = !empty($_REQUEST['z']) ? (int)trim($_REQUEST['z']) : 100;
+$resize = !empty($_REQUEST['s']) ? (int)trim($_REQUEST['s']) : 100;
 $engine = !empty($_REQUEST['e']) ? trim($_REQUEST['e']) : 'phantom'; // phantom, slimer
 $type = !empty($_REQUEST['t']) ? trim($_REQUEST['t']) : 'json'; // json, redirect, image
 $force = !empty($_REQUEST['f']) ? true : false; // 取得
@@ -70,6 +72,7 @@ $return = array(
         'height' => $height,
         'userAgent' => $ua,
         'zoom' => $zoom,
+        'resize' => $resize,
         'engine' => $engine,
         'type' => $type,
         'force' => $force,
@@ -77,7 +80,7 @@ $return = array(
 );
 
 // キャッシュを確認する。まずDB確認しないのはDBアクセス抑制のため
-$file = 'render/' . $engine . '/' . substr(sha1($ua), 0, 16) . '_' . $width . '_' . $height . '_' . $zoom . '/' . substr(sha1($url), 0, 2) . '/' . sha1($url) . '.png';
+$file = 'render/' . $engine . '/' . substr(sha1($ua), 0, 16) . '_' . $width . '_' . $height . '_' . $zoom . '_' . $resize . '/' . substr(sha1($url), 0, 2) . '/' . sha1($url) . '.png';
 $imageUrl = 'http://' . $_SERVER['HTTP_HOST'] . '/' . $file;
 $cacheUrl = $imageUrl;
 
@@ -116,31 +119,34 @@ if (!$force && file_exists($file)) {
     }
 
     // キューに突っ込む
-    $stmt_find = $pdo->prepare('select * from queue_' . $engine .  ' where url=:url and width=:width and height=:height and user_agent=:user_agent and zoom=:zoom order by id DESC limit 1');
+    $stmt_find = $pdo->prepare('select * from queue_' . $engine .  ' where url=:url and width=:width and height=:height and user_agent=:user_agent and zoom=:zoom and resize=:resize order by id DESC limit 1');
     $stmt_find->execute(array(
             'url' => $url,
             'width' => $width,
             'height' => $height,
             'user_agent' => $ua,
             'zoom' => $zoom,
+            'resize' => $resize,
         ));
 //    $res = $stmt_find->fetchAll(PDO::FETCH_ASSOC);
     $res = $stmt_find->fetch();
     if (!$res || $force) {
-        $stmt_insert = $pdo->prepare('insert into queue_' . $engine . ' set url=:url, width=:width, height=:height, user_agent=:user_agent, zoom=:zoom, ip=:ip');
+        $stmt_insert = $pdo->prepare('insert into queue_' . $engine . ' set url=:url, width=:width, height=:height, user_agent=:user_agent, zoom=:zoom, resize=:resize, ip=:ip');
         $stmt_insert->execute(array(
                 'url' => $url,
                 'width' => $width,
                 'height' => $height,
                 'user_agent' => $ua,
                 'zoom' => $zoom,
+                'resize' => $resize,
                 'ip' => $_SERVER['HTTP_X_FORWARDED_FOR'] ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'],
             ));
         $status = 'wait';
 //        usleep(1000); // すぐDB読んでも反映されないので
 
         // 取得スクリプトを起こす。batch_phantom.php or batch_slimer.php
-        exec('php ' . __DIR__ . '/../cli/batch_' . $engine . '.php > /dev/null &');
+        exec('php ' . __DIR__ . '/../cli/batch_' . $engine . '.php > ' . __DIR__ . '/../log/exec_batch_log &');
+//        exec('php ' . __DIR__ . '/../cli/batch_' . $engine . '.php > /dev/null &');
 
     } else {
         $status = $res['status'];
