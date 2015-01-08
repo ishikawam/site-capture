@@ -14,15 +14,8 @@ usleep(mt_rand(0,1000000)); // 同時起動をずらす
 
 // lock
 $output = array();
-$count = 0;
-exec('ps x | grep "batch_phantom.php"', $output);
-foreach ($output as $val) {
-    if (preg_match('|php cli/batch_phantom.php|', $val)) {
-        $count ++;
-    }
-}
-if ($count > 2) { // phantomは同時起動3つくらい？
-    var_dump($output);
+exec('ps x | grep "php .*cli/batch_phantom.php"', $output);
+if (count($output) > 5) { // phantomは同時起動3つくらい？
     exit;
 }
 

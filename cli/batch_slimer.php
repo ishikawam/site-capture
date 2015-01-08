@@ -19,15 +19,8 @@ usleep(mt_rand(0,1000000)); // 同時起動をずらす
 
 // lock
 $output = array();
-$count = 0;
-exec('ps x | grep "batch_slimer.php"', $output);
-foreach ($output as $val) {
-    if (preg_match('|php cli/batch_slimer.php|', $val)) {
-        $count ++;
-    }
-}
-if ($count > 1) { // slimerは同時起動1つくらい。
-    var_dump($output);
+exec('ps x | grep "php .*cli/batch_slimer.php"', $output);
+if (count($output) > 3) { // slimerは同時起動1つくらい。
     exit;
 }
 
