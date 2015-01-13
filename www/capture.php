@@ -16,6 +16,7 @@
  * e	pahtom or slimer
  * t	json, redirect or image
  * f	force
+ * b	batch (priority down)
  *
  * @todo; まだApacheもPHPもデフォルト。チューニングしなきゃ。
  * @todo; HARとか活用したい
@@ -39,6 +40,7 @@ $resize = !empty($_REQUEST['s']) ? (int)trim($_REQUEST['s']) : 100;
 $engine = !empty($_REQUEST['e']) ? trim($_REQUEST['e']) : 'phantom'; // phantom, slimer
 $type = !empty($_REQUEST['t']) ? trim($_REQUEST['t']) : 'json'; // json, redirect, image
 $force = !empty($_REQUEST['f']) ? true : false; // 取得
+$priority = (int)trim($_REQUEST['b']); // バッチは優先度低。低いほど優先度高い。。デフォルトは0=最高
 
 $force = false; // 今は制限 @todo;
 
@@ -131,7 +133,7 @@ if (!$force && file_exists($file)) {
 //    $res = $stmt_find->fetchAll(PDO::FETCH_ASSOC);
     $res = $stmt_find->fetch();
     if (!$res || $force) {
-        $stmt_insert = $pdo->prepare('insert into queue_' . $engine . ' set url=:url, width=:width, height=:height, user_agent=:user_agent, zoom=:zoom, resize=:resize, ip=:ip');
+        $stmt_insert = $pdo->prepare('insert into queue_' . $engine . ' set url=:url, width=:width, height=:height, user_agent=:user_agent, zoom=:zoom, resize=:resize, ip=:ip, priority=:priority');
         $stmt_insert->execute(array(
                 'url' => $url,
                 'width' => $width,
@@ -140,15 +142,26 @@ if (!$force && file_exists($file)) {
                 'zoom' => $zoom,
                 'resize' => $resize,
                 'ip' => $_SERVER['HTTP_X_FORWARDED_FOR'] ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'],
+                'priority' => $priority,
             ));
         $status = 'wait';
 //        usleep(1000); // すぐDB読んでも反映されないので
 
         // 取得スクリプトを起こす。batch_phantom.php or batch_slimer.php
-        exec('php ' . __DIR__ . '/../cli/batch_' . $engine . '.php > ' . __DIR__ . '/../log/exec_batch_log &');
+            exec('php ' . __DIR__ . '/../cli/batch_' . $engine . '.php >> ' . __DIR__ . '/../log/exec_' . $engine . '_batch_log &');
 //        exec('php ' . __DIR__ . '/../cli/batch_' . $engine . '.php > /dev/null &');
 
-    } else {
+    } else if ($res) {
+        // キューの優先度を上げるためにupdate
+//        if (!$priority) {
+            $stmt_update = $pdo->prepare('update queue_' . $engine . ' set priority=:priority, created_at=NOW() where id=:id');
+//            $stmt_update = $pdo->prepare('update queue_' . $engine . ' set created_at=NOW() where id=:id');
+            $stmt_update->execute(array(
+                    'id' => $res['id'],
+                    'priority' => $priority,
+                ));
+//        }
+
         $status = $res['status'];
         if ($status == 'busy' || !$status) {
             $status = 'wait';

@@ -4,6 +4,17 @@
  *
  */
 
+usleep(mt_rand(0,100000)); // 同時起動をずらす
+
+// lock
+$output = array();
+//exec('ps x | grep "[0-9]:[0-9]\{2\}\.[0-9]\{2\} \(gtimeout [0-9]* \)*[0-9a-zA-Z_/\.-]*php .*cli/batch_slimer\.php"', $output);
+exec('ps x | grep "[0-9]:[0-9]\{2\}\.[0-9]\{2\} [0-9a-zA-Z_/\.-]*php .*cli/batch_slimer\.php"', $output);
+//exec('ps x | grep "php .*cli/batch_slimer.php"', $output);
+if (count($output) > 1) { // slimerは同時起動1つくらい。
+    exit;
+}
+
 include(__DIR__ . '/../inc/common.php');
 $common = new Common;
 
@@ -15,20 +26,12 @@ if (exec('uname') == 'Linux') {
     $display = 'DISPLAY=' . $common->config['display'] . ' '; // @todo; 可変
 }
 
-usleep(mt_rand(0,1000000)); // 同時起動をずらす
-
-// lock
-$output = array();
-exec('ps x | grep "php .*cli/batch_slimer.php"', $output);
-if (count($output) > 3) { // slimerは同時起動1つくらい。
-    exit;
-}
-
 $return = array();
 
 $engine = 'slimer';
 
-$command = $display . ' PATH=$PATH:' . $path . ' casperjs --engine=slimerjs ' .__DIR__ . '/render_casper.js slimer';
+$command = $display . ' PATH=$PATH:' . $path . ' gtimeout 120 casperjs --engine=slimerjs ' .__DIR__ . '/render_casper.js slimer';
+//$command = $display . ' PATH=$PATH:' . $path . ' casperjs --engine=slimerjs ' .__DIR__ . '/render_casper.js slimer';
 //$command = 'xvfb-run ' . $path . 'casperjs --engine=slimerjs cli/render_casper.js slimer'; // xvfb-runだと遅い。$DISPLAY使ったほうがいいなあ。GNOMEの。
 
 // DB
@@ -41,19 +44,15 @@ try {
 
 // 最初と最後だけ、を繰り返す。＞毎度取り直すのは更新された時のため＞新しいクエリ優先
 for ($i = 0; $i < 1000; $i ++) {
-    $stmt_find = $pdo->query('select * from queue_slimer where status = \'\'');
+    $stmt_find = $pdo->query('select * from queue_slimer where status = \'\' order by priority ASC, created_at DESC limit 1');
     $res = $stmt_find->fetchAll(PDO::FETCH_ASSOC);
-//    var_dump($res);
     if (!$res) {
         // 終わった
         exit;
     }
 
     $queue = array();
-    $queue []= array_pop($res);
-    if ($res) {
-        $queue []= array_shift($res);
-    }
+    $queue []= array_pop($res); // 最新のみ
 
     // busyフラグを立てる
     foreach ($queue as $key => $val) {
@@ -111,7 +110,7 @@ for ($i = 0; $i < 1000; $i ++) {
         }
 
         // 縮小
-        if ($resize != 100) {
+        if ($resize != 100 && file_exists($file)) {
             $resize_width = $width * $resize * 0.01;
             $image = new Imagick($file);
             $image->thumbnailImage($resize_width, 0);

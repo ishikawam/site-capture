@@ -35,9 +35,10 @@ CREATE TABLE `queue_phantom` (
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `ip` varchar(64) NOT NULL DEFAULT '' COMMENT 'BANするため',
   `status` varchar(10) NOT NULL DEFAULT '' COMMENT 'error, none, busy',
+  `priority` tinyint(3) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `url` (`url`(255),`width`,`height`,`user_agent`(255),`zoom`,`resize`),
-  KEY `status` (`status`)
+  KEY `status` (`status`, `priority`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 # queue_slimer
@@ -52,7 +53,8 @@ CREATE TABLE `queue_slimer` (
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `ip` varchar(64) NOT NULL DEFAULT '' COMMENT 'BANするため',
   `status` varchar(10) NOT NULL DEFAULT '' COMMENT 'error, none, busy',
+  `priority` tinyint(3) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `url` (`url`(255),`width`,`height`,`user_agent`(255),`zoom`,`resize`),
-  KEY `status` (`status`)
+  KEY `status` (`status`, `priority`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
