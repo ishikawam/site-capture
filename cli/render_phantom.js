@@ -230,10 +230,10 @@ var RenderUrlsToFile = function(urls, callbackPerUrl, callbackFinal) {
                         return document.title;
                     });
 
-                    har = createHAR(url, page);
-                    fs.write(file_har, JSON.stringify(har, undefined, 4));
+//                    har = createHAR(url, page);
+//                    fs.write(file_har, JSON.stringify(har, undefined, 4));
 
-                    fs.write(file_content, page.content);
+//                    fs.write(file_content, page.content);
 
                     return next(status, url, file);
                 }), 1000); // 開いて2秒後がだいたい整っていると判断。

@@ -141,7 +141,7 @@ if (!$force && file_exists($file)) {
                 'user_agent' => $ua,
                 'zoom' => $zoom,
                 'resize' => $resize,
-                'ip' => $_SERVER['HTTP_X_FORWARDED_FOR'] ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'],
+                'ip' => isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'],
                 'priority' => $priority,
             ));
         $status = 'wait';
