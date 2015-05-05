@@ -7,11 +7,18 @@
 usleep(mt_rand(0,100000)); // 同時起動をずらす
 
 // lock
-$output = array();
-//exec('ps x | grep "[0-9]:[0-9]\{2\}\.[0-9]\{2\} \(gtimeout [0-9]* \)*[0-9a-zA-Z_/\.-]*php .*cli/batch_slimer\.php"', $output);
+// まずphantomのプロセス数を調べる。起動していればslimerは1。してなければ6、同時起動。
+$output = [];
+exec('ps x | grep "[0-9]:[0-9]\{2\}\.[0-9]\{2\} [0-9a-zA-Z_/\.-]*php .*cli/batch_phantom\.php"', $output);
+$max_process = 1;
+if (count($output) < 1) {
+    $max_process = 6;
+}
+
+$output = [];
 exec('ps x | grep "[0-9]:[0-9]\{2\}\.[0-9]\{2\} [0-9a-zA-Z_/\.-]*php .*cli/batch_slimer\.php"', $output);
 //exec('ps x | grep "php .*cli/batch_slimer.php"', $output);
-if (count($output) > 1) { // slimerは同時起動1つくらい。
+if (count($output) > $max_process) { // slimer同時起動
     exit;
 }
 
@@ -43,7 +50,7 @@ try {
 }
 
 // 最初と最後だけ、を繰り返す。＞毎度取り直すのは更新された時のため＞新しいクエリ優先
-for ($i = 0; $i < 1000; $i ++) {
+for ($i = 0; $i < 50; $i ++) { // あんまり大きいとphantom割り込み入ったときに抜けれない
     $stmt_find = $pdo->query('select * from queue_slimer where status = \'\' order by priority ASC, created_at DESC limit 1');
     $res = $stmt_find->fetchAll(PDO::FETCH_ASSOC);
     if (!$res) {

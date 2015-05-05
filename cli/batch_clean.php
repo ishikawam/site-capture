@@ -31,6 +31,7 @@ try {
     exit;
 }
 
+// @todo; 本当は同じ結果が返ったら間隔を広げていきたい。error->1日、3日、7日、30日、とか
 $config = array(
     'phantom' => array(
         'busy' => '1 hour',

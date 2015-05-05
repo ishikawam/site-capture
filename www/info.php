@@ -6,10 +6,20 @@
  * json
  */
 
+$cache = apc_fetch('capture_server_info');
+if ($cache !== false) {
+    echo json_encode($cache);
+    return;
+}
+
+
 include(__DIR__ . '/../inc/common.php');
 $common = new Common;
 
 $return = [];
+
+// updated_at
+$return['updated_at'] = date('Y-m-d H:i:s', time());
 
 // DB
 try {
@@ -100,3 +110,4 @@ foreach($wc as $val) {
 // output
 header('Content-Type: application/json; charset=utf-8');
 echo json_encode($return);
+apc_store('capture_server_info', $return, 10); // 10秒キャッシュ
