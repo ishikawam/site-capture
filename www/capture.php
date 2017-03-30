@@ -40,7 +40,7 @@ $resize = !empty($_REQUEST['s']) ? (int)trim($_REQUEST['s']) : 100;
 $engine = !empty($_REQUEST['e']) ? trim($_REQUEST['e']) : 'phantom'; // phantom, slimer
 $type = !empty($_REQUEST['t']) ? trim($_REQUEST['t']) : 'json'; // json, redirect, image
 $force = !empty($_REQUEST['f']) ? true : false; // 取得
-$priority = (int)trim($_REQUEST['b']); // バッチは優先度低。低いほど優先度高い。。デフォルトは0=最高
+$priority = (int)trim(!empty($_REQUEST['b']) ? trim($_REQUEST['b']) : 0); // バッチは優先度低。低いほど優先度高い。。デフォルトは0=最高
 
 $force = false; // 今は制限 @todo;
 
@@ -148,8 +148,9 @@ if (!$force && file_exists($file)) {
 //        usleep(1000); // すぐDB読んでも反映されないので
 
         // 取得スクリプトを起こす。batch_phantom.php or batch_slimer.php
-            exec('php ' . __DIR__ . '/../cli/batch_' . $engine . '.php >> ' . __DIR__ . '/../log/exec_' . $engine . '_batch_log &');
-//        exec('php ' . __DIR__ . '/../cli/batch_' . $engine . '.php > /dev/null &');
+//            exec('php ' . __DIR__ . '/../cli/batch_' . $engine . '.php >> ' . __DIR__ . '/../log/exec_' . $engine . '_batch_log &');
+            exec('php ' . __DIR__ . '/../cli/batch_' . $engine . '.php 2>> ' . __DIR__ . '/../log/exec_' . $engine . '_batch_log &');
+//            exec('php ' . __DIR__ . '/../cli/batch_' . $engine . '.php > /dev/null &');
 
     } else if ($res) {
         // キューの優先度を上げるためにupdate

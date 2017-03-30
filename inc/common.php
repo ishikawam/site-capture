@@ -106,7 +106,7 @@ class Common
     public function logger($message, $file = '') {
         echo $message . "\n";
         if ($file) {
-            file_put_contents(__DIR__ . '/../log/' .$file, date('Y-m-d H:i:s	', time()) . $message. "\n", FILE_APPEND);
+            file_put_contents(__DIR__ . '/../log/' .$file, date('[Y-m-d H:i:s]	', time()) . $message. "\n", FILE_APPEND);
         }
     }
 }

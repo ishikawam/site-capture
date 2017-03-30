@@ -10,10 +10,8 @@ usleep(mt_rand(0,100000)); // 同時起動をずらす
 // まずphantomのプロセス数を調べる。起動していればslimerは1。してなければ6、同時起動。
 $output = [];
 exec('ps x | grep "[0-9]:[0-9]\{2\}\.[0-9]\{2\} [0-9a-zA-Z_/\.-]*php .*cli/batch_phantom\.php"', $output);
-$max_process = 1;
-if (count($output) < 1) {
-    $max_process = 6;
-}
+
+$max_process = max(6 - count($output), 1);
 
 $output = [];
 exec('ps x | grep "[0-9]:[0-9]\{2\}\.[0-9]\{2\} [0-9a-zA-Z_/\.-]*php .*cli/batch_slimer\.php"', $output);
@@ -80,7 +78,7 @@ for ($i = 0; $i < 50; $i ++) { // あんまり大きいとphantom割り込み入
         $zoom = $val['zoom'];
         $resize = $val['resize'];
 
-        echo("$url ($width*$height) \n");
+        $common->logger("$url ($width*$height)", 'batch_phantom_log');
 
         $file = __DIR__ . '/../www/render/' . $engine . '/' . substr(sha1($ua), 0, 16) . '_' . $width . '_' . $height . '_' . $zoom . '_' . $resize . '/' . substr(sha1($url), 0, 2) . '/' . sha1($url) . '.png';
 

@@ -7,7 +7,7 @@
 usleep(mt_rand(0,100000)); // 同時起動をずらす
 
 // lock
-$output = array();
+$output = [];
 //exec('ps x | grep "[0-9]:[0-9]\{2\}\.[0-9]\{2\} \(gtimeout [0-9]* \)*[0-9a-zA-Z_/\.-]*php .*cli/batch_phantom\.php"', $output);
 exec('ps x | grep "[0-9]:[0-9]\{2\}\.[0-9]\{2\} [0-9a-zA-Z_/\.-]*php .*cli/batch_phantom\.php"', $output);
 //exec('ps x | grep "php .*cli/batch_phantom.php"', $output);
@@ -21,7 +21,7 @@ $common = new Common;
 chdir(__DIR__ . '/../www/');
 $path = $common->config['path'];
 
-$return = array();
+$return = [];
 
 $engine = 'phantom';
 
@@ -46,7 +46,7 @@ for ($i = 0; $i < 1000; $i ++) {
         exit;
     }
 
-    $queue = array();
+    $queue = [];
     $queue []= array_pop($res); // 最新のみ
 
     // busyフラグを立てる
@@ -68,20 +68,20 @@ for ($i = 0; $i < 1000; $i ++) {
         $zoom = $val['zoom'];
         $resize = $val['resize'];
 
-        echo("$url ($width*$height) \n");
+        $common->logger("$url ($width*$height)", 'batch_phantom_log');
 
         $file = __DIR__ . '/../www/render/' . $engine . '/' . substr(sha1($ua), 0, 16) . '_' . $width . '_' . $height . '_' . $zoom . '_' . $resize . '/' . substr(sha1($url), 0, 2) . '/' . sha1($url) . '.png';
 
         $str = $command . ' ' . $url . ' ' . $width . ' ' . $height . ' \'' . $ua . '\' ' . $zoom . ' ' . $resize;
         $str .= ' 2>&1'; // エラーも渡す
-        $output = array();
+        $output = [];
         exec($str, $output); // 取得処理
 
-        $common->logger("\n" . $str . "\n" . implode("\n", $output), 'batch_phantom_log');
+        $common->logger($str . "\n" . implode("\n", $output), 'batch_phantom_log');
 
         $flag = false;
         foreach ($output as $line) {
-            $output2 = array();
+            $output2 = [];
             if (preg_match('/^Phantom([^:]*):(.*)/', $line, $output2)) {
                 if ($output2[1] == 'Status' && trim($output2[2]) == '404') {
                     // phantomはnot found画像を記録しちゃう？？？わからん
@@ -90,9 +90,9 @@ for ($i = 0; $i < 1000; $i ++) {
                     break;
                 } else if ($output2[1] == 'Ok') {
                     $stmt_delete = $pdo->prepare('delete from queue_phantom where id=:id');
-                    $stmt_delete->execute(array(
+                    $stmt_delete->execute([
                             'id' => $val['id'],
-                        ));
+                        ]);
                     $flag = true;
                     // deleteなのでログを残す
                     $common->logger(implode("\t", $val), 'done_phantom_log');
@@ -105,7 +105,7 @@ for ($i = 0; $i < 1000; $i ++) {
                 }
             }
         }
-        if (!$flag) {
+        if (! $flag) {
             // Phantomが反応してない？
             $common->logger('> !!!Fatal Error!!!', 'batch_phantom_log');
             $pdo->exec('update queue_phantom SET status = \'error\' where id = ' . $val['id']);
