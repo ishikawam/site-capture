@@ -15,7 +15,8 @@ class Common
             // casperjs, phantomjs, slimerjs
             '__DIR__/../node_modules/.bin',
             // node
-            '~/.nvm/v0.10.33/bin', // mac
+            '~/.nvm/versions/node/v0.12.18/bin/', // macbook
+            '~/.nvm/v0.10.33/bin', // mac 旧
             '~/.nvm/v0.10.31/bin', // fire
         ),
 

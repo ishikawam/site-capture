@@ -6,7 +6,7 @@
  * json
  */
 
-$cache = apc_fetch('capture_server_info');
+$cache = apcu_fetch('capture_server_info');
 if ($cache !== false) {
     echo json_encode($cache);
     return;
@@ -30,6 +30,7 @@ try {
 }
 
 // queue phantom, slimer
+$return['queue'] = [];
 foreach(['phantom', 'slimer'] as $engine) {
     $stmt_find = $pdo->query('select status,width,height,user_agent,zoom,resize,priority,ip,count(*) as count from queue_' . $engine . ' group by status,width,height,user_agent,zoom,resize,priority,ip;');
     while ($val = $stmt_find->fetch(PDO::FETCH_ASSOC)) {
@@ -51,6 +52,7 @@ exec('df -m', $df);
 Filesystem    1M-blocks  Used Available Capacity  iused    ifree %iused  Mounted on
 /dev/disk1       114588 39968     74369    35% 10295857 19038686   35%   /
 */
+$return['df'] = [];
 foreach($df as $val) {
     $val = preg_split('/ +/', $val);
     if (end($val) == 'on') {
@@ -65,6 +67,7 @@ foreach($df as $val) {
 }
 
 // ps head 5
+$return['ps'] = [];
 foreach(['r'=>'cpu', 'm'=>'mem'] as $option => $type) {
     $ps = [];
     exec('ps auxwww -' . $option . ' | head -6', $ps);
@@ -95,6 +98,7 @@ array_shift($output);
 $return['la'] = array_map(function($c){return (float)$c;},$output);
 
 // log
+$return['log'] = [];
 exec('cd ' . __DIR__ . '/../log/; wc -l *', $wc);
 foreach($wc as $val) {
     $outpput = [];
@@ -110,4 +114,4 @@ foreach($wc as $val) {
 // output
 header('Content-Type: application/json; charset=utf-8');
 echo json_encode($return);
-apc_store('capture_server_info', $return, 10); // 10秒キャッシュ
+apcu_store('capture_server_info', $return, 10); // 10秒キャッシュ

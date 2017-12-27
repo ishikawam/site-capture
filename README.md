@@ -1,13 +1,16 @@
 site-capture
 ============
 
-for use
+php7.1
+
+
+### for use
 ```
 bower install
 npm install
 ```
 
-and for develop
+### and for develop
 ```
 bundle install
 ```
