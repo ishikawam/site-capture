@@ -21,8 +21,8 @@ class Common
         ),
 
         'database' => array(
-            'db' => 'mysql:host=localhost; dbname=capture;', // fire
-//            'db' => 'mysql:host=localhost; dbname=capture; unix_socket=/tmp/mysql.sock' // mac
+//            'db' => 'mysql:host=localhost; dbname=capture;', // fire
+            'db' => 'mysql:host=localhost; dbname=capture; unix_socket=/tmp/mysql.sock', // mac
             'user' => 'capture',
             'password' => '',
         ),
