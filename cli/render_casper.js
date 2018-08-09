@@ -2,7 +2,7 @@
  * Casper render URL to file
  *
  * 成功すれば保存、失敗すれば何もしない。
- * 保存場所は sha1(user_agent)の先頭16文字+'_'+width+'_'+height+'_'+zoom+'_'+resize+'/'+sha1(url)の先頭2文字+'/'+ sha1(url) .png
+ * 保存場所は sha1(user_agent)の先頭16文字+'_'+width+'_'+height+'_'+zoom+'_'+resize+'_'+delay+'/'+sha1(url)の先頭2文字+'/'+ sha1(url) .png
  * zoom, resizeは10〜200でパーセント表示
  * @todo; netsniff.js のHARを活用したい
  * @todo; リダイレクトされたらsuccessなのに保存されないぽい
@@ -19,7 +19,17 @@ eval(viewport_zoom); //よくないね
 
 var urls = null;
 if (system.args.length > 4) {
-    // 引数 3, engine (phantomjs or slimerjs) 4,url 5,width(デフォルト1024) 6,height(デフォルトwidth*3/4) 7, useragent(デフォルトMac) 8, zoom(デフォルト100) 9, resize(デフォルト100)
+    /**
+     * 引数
+     * 3, engine (phantomjs or slimerjs)
+     * 4,url
+     * 5,width(デフォルト1024)
+     * 6,height(デフォルトwidth*3/4)
+     * 7, useragent(デフォルトMac)
+     * 8, zoom(デフォルト100)
+     * 9, resize(デフォルト100)
+     * 10, delay(デフォルト0)
+    */
     urls = Array.prototype.slice.call(system.args, 1);
 } else {
     console.log('CasperError: invalid');
@@ -34,6 +44,7 @@ var user_agent = urls[7] ? urls[7] : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_
 //    var user_agent = urls[7] ? urls[7] : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.94 Safari/537.36'; // mac chrome 1024x768
 var zoom = urls[8] ? urls[8] : 100;
 var resize = urls[9] ? urls[9] : 100;
+var delay = urls[10] ? urls[10] : 0;
 
 var casper = require('casper').create({
     viewportSize: {
@@ -47,7 +58,7 @@ var casper = require('casper').create({
 
 casper.start();
 
-casper.wait(3000); // 3秒のDelay必要
+casper.wait(3000 + delay*1000); // 3秒のDelay必要
 
 if (user_agent) {
     casper.userAgent(user_agent);
@@ -56,7 +67,7 @@ if (user_agent) {
 //console.log([url, width, height, user_agent]);
 
 // 保存ファイル名 sha1のprefix 2文字をディレクトリにして(gitと同じ)想定256*10000=200万サイトくらいかな
-var dir = CryptoJS.SHA1(user_agent).toString().substr(0, 16) + '_' + width + '_' + height + '_' + zoom + '_' + resize;
+var dir = CryptoJS.SHA1(user_agent).toString().substr(0, 16) + '_' + width + '_' + height + '_' + zoom + '_' + resize + '_' + delay;
 var url_sha1 = CryptoJS.SHA1(url).toString();
 var file = 'render/' + engine + '/' + dir + '/' + url_sha1.substr(0, 2) + '/' + url_sha1 + '.png';
 //var file_har = 'har/'+ dir + '/' + url_sha1.substr(0, 2) + '/' + url_sha1;

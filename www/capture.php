@@ -10,8 +10,7 @@
  * ua	user agent
  * z	zoom
  * s	resize (imagemagick)
- * [定義指定モード] @todo; 未実装
- * d	定義したデバイス名 (ex. pc, mobile, tablet)
+ * d	delay
  * [共通]
  * e	pahtom or slimer
  * t	json, redirect or image
@@ -37,12 +36,13 @@ $height = !empty($_REQUEST['h']) ? (int)trim($_REQUEST['h']) : round($width*3/4)
 $ua = !empty($_REQUEST['ua']) ? trim($_REQUEST['ua']) : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.94 Safari/537.36';
 $zoom = !empty($_REQUEST['z']) ? (int)trim($_REQUEST['z']) : 100;
 $resize = !empty($_REQUEST['s']) ? (int)trim($_REQUEST['s']) : 100;
+$delay = !empty($_REQUEST['d']) ? (int)trim($_REQUEST['d']) : 0;
 $engine = !empty($_REQUEST['e']) ? trim($_REQUEST['e']) : 'phantom'; // phantom, slimer
 $type = !empty($_REQUEST['t']) ? trim($_REQUEST['t']) : 'json'; // json, redirect, image
 $force = !empty($_REQUEST['f']) ? true : false; // 取得
 $priority = (int)trim(!empty($_REQUEST['b']) ? trim($_REQUEST['b']) : 0); // バッチは優先度低。低いほど優先度高い。。デフォルトは0=最高
 
-$force = false; // 今は制限 @todo;
+//$force = false; // forceやると攻撃されたときに被害が大きい
 
 $device = 'pc';
 if ($width / $height < 0.6) {
@@ -75,6 +75,7 @@ $return = array(
         'userAgent' => $ua,
         'zoom' => $zoom,
         'resize' => $resize,
+        'delay' => $delay,
         'engine' => $engine,
         'type' => $type,
         'force' => $force,
@@ -82,7 +83,7 @@ $return = array(
 );
 
 // キャッシュを確認する。まずDB確認しないのはDBアクセス抑制のため
-$file = 'render/' . $engine . '/' . substr(sha1($ua), 0, 16) . '_' . $width . '_' . $height . '_' . $zoom . '_' . $resize . '/' . substr(sha1($url), 0, 2) . '/' . sha1($url) . '.png';
+$file = 'render/' . $engine . '/' . substr(sha1($ua), 0, 16) . '_' . $width . '_' . $height . '_' . $zoom . '_' . $resize . '_' . $delay . '/' . substr(sha1($url), 0, 2) . '/' . sha1($url) . '.png';
 $imageUrl = 'http://' . $_SERVER['HTTP_HOST'] . '/' . $file;
 $cacheUrl = $imageUrl;
 
@@ -121,7 +122,7 @@ if (!$force && file_exists($file)) {
     }
 
     // キューに突っ込む
-    $stmt_find = $pdo->prepare('select * from queue_' . $engine .  ' where url=:url and width=:width and height=:height and user_agent=:user_agent and zoom=:zoom and resize=:resize order by id DESC limit 1');
+    $stmt_find = $pdo->prepare('select * from queue_' . $engine .  ' where url=:url and width=:width and height=:height and user_agent=:user_agent and zoom=:zoom and resize=:resize and delay=:delay order by id DESC limit 1');
     $stmt_find->execute(array(
             'url' => $url,
             'width' => $width,
@@ -129,11 +130,12 @@ if (!$force && file_exists($file)) {
             'user_agent' => $ua,
             'zoom' => $zoom,
             'resize' => $resize,
+            'delay' => $delay,
         ));
 //    $res = $stmt_find->fetchAll(PDO::FETCH_ASSOC);
     $res = $stmt_find->fetch();
     if (!$res || $force) {
-        $stmt_insert = $pdo->prepare('insert into queue_' . $engine . ' set url=:url, width=:width, height=:height, user_agent=:user_agent, zoom=:zoom, resize=:resize, ip=:ip, priority=:priority');
+        $stmt_insert = $pdo->prepare('insert into queue_' . $engine . ' set url=:url, width=:width, height=:height, user_agent=:user_agent, zoom=:zoom, resize=:resize, delay=:delay, ip=:ip, priority=:priority');
         $stmt_insert->execute(array(
                 'url' => $url,
                 'width' => $width,
@@ -141,6 +143,7 @@ if (!$force && file_exists($file)) {
                 'user_agent' => $ua,
                 'zoom' => $zoom,
                 'resize' => $resize,
+                'delay' => $delay,
                 'ip' => isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'],
                 'priority' => $priority,
             ));
@@ -149,7 +152,7 @@ if (!$force && file_exists($file)) {
 
         // 取得スクリプトを起こす。batch_phantom.php or batch_slimer.php
 //            exec('php ' . __DIR__ . '/../cli/batch_' . $engine . '.php >> ' . __DIR__ . '/../log/exec_' . $engine . '_batch_log &');
-            exec('php ' . __DIR__ . '/../cli/batch_' . $engine . '.php 2>> ' . __DIR__ . '/../log/exec_' . $engine . '_batch_log &');
+//            exec('php ' . __DIR__ . '/../cli/batch_' . $engine . '.php 2>> ' . __DIR__ . '/../log/exec_' . $engine . '_batch_log &');
 //            exec('php ' . __DIR__ . '/../cli/batch_' . $engine . '.php > /dev/null &');
 
     } else if ($res) {

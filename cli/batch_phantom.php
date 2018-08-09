@@ -67,12 +67,13 @@ for ($i = 0; $i < 1000; $i ++) {
         $ua = $val['user_agent'];
         $zoom = $val['zoom'];
         $resize = $val['resize'];
+        $delay = $val['delay'];
 
         $common->logger("$url ($width*$height)", 'batch_phantom_log');
 
-        $file = __DIR__ . '/../www/render/' . $engine . '/' . substr(sha1($ua), 0, 16) . '_' . $width . '_' . $height . '_' . $zoom . '_' . $resize . '/' . substr(sha1($url), 0, 2) . '/' . sha1($url) . '.png';
+        $file = __DIR__ . '/../www/render/' . $engine . '/' . substr(sha1($ua), 0, 16) . '_' . $width . '_' . $height . '_' . $zoom . '_' . $resize . '_' . $delay . '/' . substr(sha1($url), 0, 2) . '/' . sha1($url) . '.png';
 
-        $str = $command . ' ' . $url . ' ' . $width . ' ' . $height . ' \'' . $ua . '\' ' . $zoom . ' ' . $resize;
+        $str = $command . ' ' . $url . ' ' . $width . ' ' . $height . ' \'' . $ua . '\' ' . $zoom . ' ' . $resize . ' ' . $delay;
         $str .= ' 2>&1'; // エラーも渡す
         $output = [];
         exec($str, $output); // 取得処理

@@ -12,7 +12,6 @@ if ($cache !== false) {
     return;
 }
 
-
 include(__DIR__ . '/../inc/common.php');
 $common = new Common;
 
@@ -21,6 +20,7 @@ $return = [];
 // updated_at
 $return['updated_at'] = date('Y-m-d H:i:s', time());
 
+//    $common->logger("DB TEST \n", 'info.php_log');
 // DB
 try {
     $pdo = new PDO($common->config['database']['db'], $common->config['database']['user'], $common->config['database']['password']);
@@ -28,11 +28,13 @@ try {
     $common->logger("DB Error \n" . print_r($e->getMessage(), true), 'info.php_log');
     exit;
 }
+$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); // PDOはデフォルトではエラー無視されるので、例外出すように
 
 // queue phantom, slimer
 $return['queue'] = [];
+
 foreach(['phantom', 'slimer'] as $engine) {
-    $stmt_find = $pdo->query('select status,width,height,user_agent,zoom,resize,priority,ip,count(*) as count from queue_' . $engine . ' group by status,width,height,user_agent,zoom,resize,priority,ip;');
+    $stmt_find = $pdo->query('select status,width,height,user_agent,zoom,resize,delay,priority,ip,count(*) as count from queue_' . $engine . ' group by status,width,height,user_agent,zoom,resize,delay,priority,ip;');
     while ($val = $stmt_find->fetch(PDO::FETCH_ASSOC)) {
         $status = $val['status']; // '' の場合も
         unset($val['status']);
@@ -40,6 +42,7 @@ foreach(['phantom', 'slimer'] as $engine) {
         $val['height'] = (int)$val['height'];
         $val['zoom'] = (int)$val['zoom'];
         $val['resize'] = (int)$val['resize'];
+        $val['delay'] = (int)$val['delay'];
         $val['priority'] = (int)$val['priority'];
         $val['count'] = (int)$val['count'];
         $return['queue'][$engine][$status][] = $val;
