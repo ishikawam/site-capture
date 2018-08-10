@@ -100,6 +100,7 @@ for ($i = 0; $i < 1000; $i ++) {
                     break;
                 } else if ($output2[1] == 'Error') {
                     $common->logger('> !!!Error!!!', 'batch_phantom_log');
+                    $common->logger($str, 'batch_phantom_log');
                     $pdo->exec('update queue_phantom SET status = \'error\' where id = ' . $val['id']);
                     $flag = true;
                     break;

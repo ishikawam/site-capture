@@ -53,7 +53,7 @@ var casper = require('casper').create({
         verbose: true,
         logLevel: 'debug',
     },
-    timeout: 60 * 1000
+    timeout: 30 * 1000
 });
 
 casper.start();

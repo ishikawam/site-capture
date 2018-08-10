@@ -79,7 +79,7 @@ for ($i = 0; $i < 50; $i ++) { // あんまり大きいとphantom割り込み入
         $resize = $val['resize'];
         $delay = $val['delay'];
 
-        $common->logger("$url ($width*$height)", 'batch_phantom_log');
+        $common->logger("$url ($width*$height)", 'batch_slimer_log');
 
         $file = __DIR__ . '/../www/render/' . $engine . '/' . substr(sha1($ua), 0, 16) . '_' . $width . '_' . $height . '_' . $zoom . '_' . $resize . '_' . $delay . '/' . substr(sha1($url), 0, 2) . '/' . sha1($url) . '.png';
 
@@ -111,6 +111,7 @@ for ($i = 0; $i < 50; $i ++) { // あんまり大きいとphantom割り込み入
         }
         if (!$flag) {
             $common->logger('!!!Error!!! Display?', 'batch_slimer_log');
+            $common->logger($str, 'batch_slimer_log');
             // DISPLAYがおかしいとかの理由でslimerjsが機能していないかも
             $pdo->exec('update queue_slimer SET status = \'error\' where id = ' . $val['id']);
         }
