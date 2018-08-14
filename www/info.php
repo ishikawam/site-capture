@@ -8,8 +8,9 @@
 
 $cache = apcu_fetch('capture_server_info');
 if ($cache !== false) {
+    header('Content-Type: application/json; charset=utf-8');
     echo json_encode($cache);
-    return;
+    exit;
 }
 
 include(__DIR__ . '/../inc/common.php');
@@ -117,4 +118,4 @@ foreach($wc as $val) {
 // output
 header('Content-Type: application/json; charset=utf-8');
 echo json_encode($return);
-apcu_store('capture_server_info', $return, 10); // 10秒キャッシュ
+apcu_store('capture_server_info', $return, 30); // 30秒キャッシュ
