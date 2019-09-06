@@ -28,7 +28,7 @@ $common = new Common;
 
 $path = $common->config['path'];
 
-$return = array();
+$return = [];
 
 $url = !empty($_REQUEST['url']) ? trim($_REQUEST['url']) : '';
 $width = !empty($_REQUEST['w']) ? (int)trim($_REQUEST['w']) : 1024;
@@ -52,23 +52,39 @@ if ($width / $height < 0.6) {
 }
 
 // validation
+
 // http:// 省略の場合、付加
-if (!preg_match('/^(https?|ftp):\/\//', $url)) {
-    $url = 'http://' . $url;
+if (! preg_match('/^(https?|ftp):\/\//', $url)) {
+    $url = 'https://' . $url;
 }
-// ドメイン部を抽出
-if (!preg_match('/^(https?|ftp):\/\/(([a-zA-Z0-9][a-zA-Z0-9-]+\.)+[a-zA-Z]+)/', $url, $output)) {
-    $return['status'] = 'error';
-    $return['imageUrl'] = 'http://' . $_SERVER['HTTP_HOST'] . '/img/error_' . $device . '.png';
-    $return['result'] = 'URL invalid.';
+if (! preg_match('/^(https?|ftp):\/\/(([a-zA-Z0-9][a-zA-Z0-9-]+\.)+[a-zA-Z]+)/', $url)) {
+    $return = [
+        'status' => 'error',
+        'imageUrl' => 'http://' . $_SERVER['HTTP_HOST'] . '/img/error_' . $device . '.png',
+        'result' => 'URL invalid.',
+    ];
     header('Content-Type: application/json; charset=utf-8');
     echo json_encode($return);
     exit;
 }
 
-$url = $output[0];
-$return = array(
-    'request' => array(
+// parse
+$parseUrl = parse_url($url);
+if (! isset($parseUrl['scheme']) || ! isset($parseUrl['host'])) {
+    $return = [
+        'status' => 'error',
+        'imageUrl' => 'http://' . $_SERVER['HTTP_HOST'] . '/img/error_' . $device . '.png',
+        'result' => 'URL invalid 2.',
+    ];
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode($return);
+    exit;
+}
+
+$url = $parseUrl['scheme'] . '://' . $parseUrl['host'] . ($parseUrl['path'] ?? '');
+
+$return = [
+    'request' => [
         'url' => $url,
         'width' => $width,
         'height' => $height,
@@ -79,8 +95,8 @@ $return = array(
         'engine' => $engine,
         'type' => $type,
         'force' => $force,
-    ),
-);
+    ],
+];
 
 // キャッシュを確認する。まずDB確認しないのはDBアクセス抑制のため
 $file = 'render/' . $engine . '/' . substr(sha1($ua), 0, 16) . '_' . $width . '_' . $height . '_' . $zoom . '_' . $resize . '_' . $delay . '/' . substr(sha1($url), 0, 2) . '/' . sha1($url) . '.png';
@@ -123,7 +139,7 @@ if (!$force && file_exists($file)) {
 
     // キューに突っ込む
     $stmt_find = $pdo->prepare('select * from queue_' . $engine .  ' where url=:url and width=:width and height=:height and user_agent=:user_agent and zoom=:zoom and resize=:resize and delay=:delay order by id DESC limit 1');
-    $stmt_find->execute(array(
+    $stmt_find->execute([
             'url' => $url,
             'width' => $width,
             'height' => $height,
@@ -131,12 +147,12 @@ if (!$force && file_exists($file)) {
             'zoom' => $zoom,
             'resize' => $resize,
             'delay' => $delay,
-        ));
+        ]);
 //    $res = $stmt_find->fetchAll(PDO::FETCH_ASSOC);
     $res = $stmt_find->fetch();
     if (!$res || $force) {
         $stmt_insert = $pdo->prepare('insert into queue_' . $engine . ' set url=:url, width=:width, height=:height, user_agent=:user_agent, zoom=:zoom, resize=:resize, delay=:delay, ip=:ip, priority=:priority');
-        $stmt_insert->execute(array(
+        $stmt_insert->execute([
                 'url' => $url,
                 'width' => $width,
                 'height' => $height,
@@ -146,7 +162,7 @@ if (!$force && file_exists($file)) {
                 'delay' => $delay,
                 'ip' => isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'],
                 'priority' => $priority,
-            ));
+            ]);
         $status = 'wait';
 //        usleep(1000); // すぐDB読んでも反映されないので
 
@@ -160,10 +176,10 @@ if (!$force && file_exists($file)) {
 //        if (!$priority) {
             $stmt_update = $pdo->prepare('update queue_' . $engine . ' set priority=:priority, created_at=NOW() where id=:id');
 //            $stmt_update = $pdo->prepare('update queue_' . $engine . ' set created_at=NOW() where id=:id');
-            $stmt_update->execute(array(
+            $stmt_update->execute([
                     'id' => $res['id'],
                     'priority' => $priority,
-                ));
+                ]);
 //        }
 
         $status = $res['status'];
